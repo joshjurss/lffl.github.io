@@ -22,12 +22,12 @@ var LAST_UPDATED = "never"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
-  roundOf32:    2,
-  roundOf16:    3,
-  quarterFinal: 5,
-  semiFinal:    8,
-  final:        10,
-  champion:     15,  // bonus on top of 'final' for picking the winner
+  roundOf32:    1,
+  roundOf16:    2,
+  quarterFinal: 4,
+  semiFinal:    6,
+  final:        8,
+  champion:     16,  // bonus for picking the winner
 };
 
 // ── ACTUAL RESULTS ────────────────────────────────────────────
@@ -55,6 +55,44 @@ const ACTUAL_RESULTS = {
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
   champion:     null,
+};
+
+// ── LIVE STANDINGS ────────────────────────────────────────────
+// Current top 2 per group based on live standings (updated hourly).
+// Used to color group stage picks green/red during the group stage.
+const LIVE_STANDINGS = {
+  groupA: [null, null],
+  groupB: [null, null],
+  groupC: [null, null],
+  groupD: [null, null],
+  groupE: [null, null],
+  groupF: [null, null],
+  groupG: [null, null],
+  groupH: [null, null],
+  groupI: [null, null],
+  groupJ: [null, null],
+  groupK: [null, null],
+  groupL: [null, null],
+};
+
+// ── GROUP STANDINGS ───────────────────────────────────────────
+// Full standings table per group (updated hourly). Each entry:
+// {team, mp, w, d, l, gf, ga, gd, pts}
+const GROUP_STANDINGS = {
+// __GROUP_STANDINGS_START__
+  groupA: [],
+  groupB: [],
+  groupC: [],
+  groupD: [],
+  groupE: [],
+  groupF: [],
+  groupG: [],
+  groupH: [],
+  groupI: [],
+  groupJ: [],
+  groupK: [],
+  groupL: [],
+// __GROUP_STANDINGS_END__
 };
 
 // ── PARTICIPANTS ──────────────────────────────────────────────

@@ -22,6 +22,19 @@
     nav button{background:none;border:none;color:rgba(255,255,255,.6);font-family:'Inter',sans-serif;font-size:.85rem;font-weight:500;padding:8px 14px;border-radius:6px;cursor:pointer;transition:background .15s,color .15s;}
     nav button:hover{background:rgba(255,255,255,.1);color:var(--white);}
     nav button.active{background:var(--red);color:var(--white);}
+    .standings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:1.5rem;}
+    .standings-table{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+    .standings-table-header{background:var(--navy);color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.06em;padding:8px 14px;}
+    .standings-table table{width:100%;border-collapse:collapse;font-size:.8rem;}
+    .standings-table th{background:var(--off);color:var(--muted);font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:5px 8px;text-align:center;border-bottom:1px solid var(--border);}
+    .standings-table th.team-col{text-align:left;}
+    .standings-table td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);}
+    .standings-table tr:last-child td{border-bottom:none;}
+    .standings-table td.team-col{text-align:left;font-weight:500;}
+    .standings-table tr.advancing td{background:#EDF7F1;}
+    .standings-table .gd-pos{color:var(--correct);font-weight:600;}
+    .standings-table .gd-neg{color:var(--wrong);font-weight:600;}
+    .standings-no-data{color:var(--muted);font-style:italic;padding:12px 14px;font-size:.85rem;}
     .view{display:none;max-width:1100px;margin:0 auto;padding:2rem 1.5rem;}
     .view.active{display:block;}
     h1{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.04em;}
@@ -89,6 +102,7 @@
   <nav>
     <button class="active" data-view="leaderboard">Leaderboard</button>
     <button data-view="brackets">Brackets</button>
+    <button data-view="standings">World Cup Table</button>
   </nav>
 </header>
 <div id="leaderboard" class="view active">
@@ -104,6 +118,15 @@
     <div id="lb-body"></div>
   </div>
 </div>
+<div id="standings" class="view">
+  <h1>World Cup <span>Table</span></h1>
+  <p class="subtitle" id="standings-subtitle"></p>
+  <div class="standings-grid" id="standings-grid"></div>
+  <div style="margin-top:2.5rem">
+    <div class="section-label" style="margin-bottom:1.5rem">Knockout Bracket</div>
+    <div id="wc-bracket-body"></div>
+  </div>
+</div>
 <div id="brackets" class="view">
   <div class="person-selector" id="person-tabs"></div>
   <div id="bracket-body"></div>
@@ -116,8 +139,19 @@
 var LAST_UPDATED = "never";
 
 var SCORING = {
-  groupStage:1, roundOf32:2, roundOf16:3,
-  quarterFinal:5, semiFinal:8, final:10, champion:15
+  groupStage:1, roundOf32:1, roundOf16:2,
+  quarterFinal:4, semiFinal:6, final:8, champion:16
+};
+
+var GROUP_STANDINGS = {
+  groupA:[],groupB:[],groupC:[],groupD:[],groupE:[],groupF:[],
+  groupG:[],groupH:[],groupI:[],groupJ:[],groupK:[],groupL:[]
+};
+
+var LIVE_STANDINGS = {
+  groupA:[null,null], groupB:[null,null], groupC:[null,null], groupD:[null,null],
+  groupE:[null,null], groupF:[null,null], groupG:[null,null], groupH:[null,null],
+  groupI:[null,null], groupJ:[null,null], groupK:[null,null], groupL:[null,null]
 };
 
 var ACTUAL_RESULTS = {
@@ -214,7 +248,13 @@ function scoreGroupStage(picks,actual){
 function scoreRound(picks,actual,roundKey,pts){
   var p=0,c=0,t=0,ar=actual[roundKey],pr=picks[roundKey];
   if(!ar||!pr)return{pts:p,correct:c,total:t};
-  Object.keys(ar).forEach(function(k){var a=ar[k],pi=pr[k];if(!a)return;t+=pts;if(pi&&teamsMatch(pi,a)){p+=pts;c++;}});
+  var actualTeams=Object.values(ar).filter(Boolean);
+  if(actualTeams.length===0)return{pts:p,correct:c,total:t};
+  Object.keys(pr).forEach(function(k){
+    var pi=pr[k];if(!pi)return;
+    t+=pts;
+    if(actualTeams.some(function(a){return teamsMatch(pi,a);})){p+=pts;c++;}
+  });
   return{pts:p,correct:c,total:t};
 }
 function computeScore(id){
@@ -299,11 +339,11 @@ function renderBracket(personId){
   html+='<div class="section-label">Group Stage</div><div class="groups-grid">';
   GROUPS.forEach(function(g){
     var picked=(picks.groupStage&&picks.groupStage[g])||[];
-    var act=(ACTUAL_RESULTS[g]||[]).filter(Boolean);
-    var complete=act.length>=2;
+    var live=(LIVE_STANDINGS[g]||[]).filter(Boolean);
+    var hasLive=live.length>=2;
     html+='<div class="group-card"><div class="group-card-header">'+GROUP_LABELS[g]+'</div>';
     picked.forEach(function(team){
-      var s=complete?(act.some(function(a){return normalize(a)===normalize(team);})?'correct':'wrong'):'pending';
+      var s=hasLive?(live.some(function(a){return normalize(a)===normalize(team);})?'correct':'wrong'):'pending';
       html+='<div class="group-team"><span>'+team+'</span><span class="dot '+s+'"></span></div>';
     });
     html+='</div>';
@@ -326,11 +366,13 @@ function buildBracketHTML(picks){
   var html='<div class="bracket-scroll"><div class="bracket-tree" id="btree">';
   rounds.forEach(function(round){
     html+='<div class="b-round"><div class="b-round-label">'+round.label+'</div><div class="b-slots">';
+    var roundActuals=Object.values(ACTUAL_RESULTS[round.key]||{}).filter(Boolean);
+    var hasResults=roundActuals.length>0;
     for(var i=1;i<=round.n;i++){
       var pick=(picks[round.key]&&picks[round.key]['m'+i])||null;
-      var actual=(ACTUAL_RESULTS[round.key]&&ACTUAL_RESULTS[round.key]['m'+i])||null;
-      var cls=!pick?'empty':(!actual?'':(normalize(pick)===normalize(actual)?'winner':'loser'));
-      var pts=(actual&&normalize(pick)===normalize(actual))?'<span class="b-pts">+'+round.pts+'</span>':'';
+      var correct=pick&&hasResults&&roundActuals.some(function(a){return normalize(pick)===normalize(a);});
+      var cls=!pick?'empty':(!hasResults?'':(correct?'winner':'loser'));
+      var pts=(correct&&round.pts)?'<span class="b-pts">+'+round.pts+'</span>':'';
       html+='<div class="b-match-group"><div class="b-team '+cls+'">'+(pick||'—')+pts+'</div></div>';
     }
     html+='</div></div>';
@@ -396,8 +438,109 @@ function initBrackets(){
   renderBracket(currentPerson);
 }
 
+function buildWCBracketHTML(){
+  var rounds=[
+    {key:'roundOf32',label:'Round of 32',n:32},
+    {key:'roundOf16',label:'Round of 16',n:16},
+    {key:'quarterFinal',label:'Quarters',n:8},
+    {key:'semiFinal',label:'Semis',n:4},
+    {key:'final',label:'Final',n:2}
+  ];
+  var html='<div class="bracket-scroll"><div class="bracket-tree" id="wc-btree">';
+  rounds.forEach(function(round){
+    html+='<div class="b-round"><div class="b-round-label">'+round.label+'</div><div class="b-slots">';
+    for(var i=1;i<=round.n;i++){
+      var team=(ACTUAL_RESULTS[round.key]&&ACTUAL_RESULTS[round.key]['m'+i])||null;
+      var cls=team?'':'empty';
+      html+='<div class="b-match-group"><div class="b-team '+cls+'">'+(team||'TBD')+'</div></div>';
+    }
+    html+='</div></div>';
+  });
+  var champ=ACTUAL_RESULTS.champion||null;
+  html+='<div class="b-champ-col"><div class="b-round-label" style="text-align:center">Champion</div><div class="b-champ-box">'+
+    '<div class="champ-card'+(champ?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">Champion</div>'+
+    '<div class="cteam">'+(champ||'TBD')+'</div></div></div></div>';
+  html+='<svg class="b-svg" id="wc-bsvg" xmlns="http://www.w3.org/2000/svg"></svg>';
+  html+='</div></div>';
+  return html;
+}
+
+function drawWCLines(){
+  var tree=document.getElementById('wc-btree'),svg=document.getElementById('wc-bsvg');
+  if(!tree||!svg)return;svg.innerHTML='';
+  var tr=tree.getBoundingClientRect(),rounds=tree.querySelectorAll('.b-slots');
+  for(var ri=0;ri<rounds.length-1;ri++){
+    var cur=rounds[ri].querySelectorAll('.b-match-group'),nxt=rounds[ri+1].querySelectorAll('.b-match-group');
+    for(var ni=0;ni<nxt.length;ni++){
+      var a=cur[ni*2],b=cur[ni*2+1],c=nxt[ni];if(!a||!b||!c)continue;
+      var aR=a.querySelector('.b-team').getBoundingClientRect();
+      var bR=b.querySelector('.b-team').getBoundingClientRect();
+      var cR=c.querySelector('.b-team').getBoundingClientRect();
+      var x1=aR.right-tr.left,y1=aR.top+aR.height/2-tr.top;
+      var y2=bR.top+bR.height/2-tr.top,xM=(aR.right+cR.left)/2-tr.left;
+      var x3=cR.left-tr.left;
+      var path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d','M'+x1+','+y1+' H'+xM+' V'+y2+' H'+x1+' M'+xM+','+((y1+y2)/2)+' H'+x3);
+      path.setAttribute('fill','none');path.setAttribute('stroke','#C5D0DC');path.setAttribute('stroke-width','1.5');
+      svg.appendChild(path);
+    }
+  }
+  var ls=rounds[rounds.length-1].querySelectorAll('.b-match-group'),cb=document.querySelector('#wc-btree .b-champ-box .champ-card');
+  if(ls.length>=2&&cb){
+    var s1=ls[0].querySelector('.b-team').getBoundingClientRect();
+    var s2=ls[1].querySelector('.b-team').getBoundingClientRect();
+    var cB=cb.getBoundingClientRect();
+    var lx=s1.right-tr.left,ly1=s1.top+s1.height/2-tr.top,ly2=s2.top+s2.height/2-tr.top;
+    var lxM=(s1.right+cB.left)/2-tr.left,lx3=cB.left-tr.left;
+    var p2=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p2.setAttribute('d','M'+lx+','+ly1+' H'+lxM+' V'+ly2+' H'+lx+' M'+lxM+','+((ly1+ly2)/2)+' H'+lx3);
+    p2.setAttribute('fill','none');p2.setAttribute('stroke','#C5D0DC');p2.setAttribute('stroke-width','1.5');
+    svg.appendChild(p2);
+  }
+}
+
+function initStandings(){
+  var upd=(LAST_UPDATED!=='never')?' · updated '+LAST_UPDATED:'';
+  document.getElementById('standings-subtitle').textContent='Live group stage standings'+upd;
+  var grid=document.getElementById('standings-grid');grid.innerHTML='';
+  var groupLabels={groupA:'Group A',groupB:'Group B',groupC:'Group C',groupD:'Group D',groupE:'Group E',groupF:'Group F',groupG:'Group G',groupH:'Group H',groupI:'Group I',groupJ:'Group J',groupK:'Group K',groupL:'Group L'};
+  Object.keys(groupLabels).forEach(function(g){
+    var rows=GROUP_STANDINGS[g]||[];
+    var card=document.createElement('div');card.className='standings-table';
+    var header='<div class="standings-table-header">'+groupLabels[g]+'</div>';
+    if(!rows.length){
+      card.innerHTML=header+'<div class="standings-no-data">No matches played yet</div>';
+    }else{
+      var tbody='';
+      rows.forEach(function(t,i){
+        var gdCls=t.gd>0?'gd-pos':t.gd<0?'gd-neg':'';
+        var gdStr=t.gd>0?'+'+t.gd:t.gd;
+        tbody+='<tr class="'+(i<2?'advancing':'')+'">'+
+          '<td class="team-col">'+t.team+'</td>'+
+          '<td>'+t.mp+'</td><td>'+t.w+'</td><td>'+t.d+'</td><td>'+t.l+'</td>'+
+          '<td>'+t.gf+'</td><td>'+t.ga+'</td>'+
+          '<td class="'+gdCls+'">'+gdStr+'</td>'+
+          '<td><strong>'+t.pts+'</strong></td></tr>';
+      });
+      card.innerHTML=header+
+        '<table><thead><tr>'+
+        '<th class="team-col">Team</th><th>MP</th><th>W</th><th>D</th><th>L</th>'+
+        '<th>GF</th><th>GA</th><th>GD</th><th>Pts</th>'+
+        '</tr></thead><tbody>'+tbody+'</tbody></table>';
+    }
+    grid.appendChild(card);
+  });
+  document.getElementById('wc-bracket-body').innerHTML=buildWCBracketHTML();
+  setTimeout(drawWCLines,50);
+}
+
+window.addEventListener('resize',function(){
+  if(document.getElementById('standings').classList.contains('active'))drawWCLines();
+});
+
 initLeaderboard();
 initBrackets();
+initStandings();
 </script>
 </body>
 </html>
