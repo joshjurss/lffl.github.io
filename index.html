@@ -281,12 +281,29 @@ function scoreGroupStage(picks,actual){
   var groups=["groupA","groupB","groupC","groupD","groupE","groupF","groupG","groupH","groupI","groupJ","groupK","groupL"];
   var pts=0,correct=0,total=0;
   for(var i=0;i<groups.length;i++){
-    var g=groups[i],ag=actual[g]||[];
-    if(!groupIsComplete(ag))continue;
-    var adv=ag.filter(Boolean),pg=(picks.groupStage&&picks.groupStage[g])||[];
-    for(var j=0;j<adv.length;j++){
-      total+=SCORING.groupStage;
-      for(var k=0;k<pg.length;k++){if(teamsMatch(pg[k],adv[j])){pts+=SCORING.groupStage;correct++;break;}}
+    var g=groups[i];
+    var pg=(picks.groupStage&&picks.groupStage[g])||[];
+    if(!pg.length)continue;
+    // Use ACTUAL_RESULTS once group is complete, otherwise use live standings
+    var ag=actual[g]||[];
+    if(groupIsComplete(ag)){
+      var adv=ag.filter(Boolean);
+      for(var j=0;j<adv.length;j++){
+        total+=SCORING.groupStage;
+        for(var k=0;k<pg.length;k++){if(teamsMatch(pg[k],adv[j])){pts+=SCORING.groupStage;correct++;break;}}
+      }
+    } else {
+      // Live scoring: 1pt per pick currently showing a green circle
+      var liveTop2=(LIVE_STANDINGS[g]||[]).filter(Boolean);
+      var hasLiveData=liveTop2.length>0;
+      if(!hasLiveData)continue;
+      for(var k=0;k<pg.length;k++){
+        var team=pg[k];
+        var inTop2=liveTop2.some(function(a){return teamsMatch(team,a);});
+        var inThirds=LIVE_THIRDS.some(function(a){return teamsMatch(team,a);});
+        if(inTop2||inThirds){pts+=SCORING.groupStage;correct++;}
+        total+=SCORING.groupStage;
+      }
     }
   }
   return{pts:pts,correct:correct,total:total};
