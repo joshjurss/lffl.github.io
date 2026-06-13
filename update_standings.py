@@ -1,24 +1,32 @@
 #!/usr/bin/env python3
 """
 update_standings.py
-Fetches live 2026 World Cup group standings from the Fotmob API (league ID 77)
-and patches ACTUAL_RESULTS, LIVE_STANDINGS, and GROUP_STANDINGS in data.js.
+Fetches live 2026 World Cup group standings from Fotmob (league ID 77)
+using the fotmob-api wrapper and patches ACTUAL_RESULTS, LIVE_STANDINGS,
+and GROUP_STANDINGS in data.js.
 
 Run by GitHub Actions every hour. Safe to run manually too.
-Requires: pip install requests
+Requires: pip install fotmob-api
 """
 
 import re
 import sys
-import requests
 
-API_URL = "https://www.fotmob.com/api/leagues?id=77"
+LEAGUE_ID = 77
 DATA_JS = "data.js"
 
 GROUP_KEYS = ["groupA","groupB","groupC","groupD","groupE","groupF",
               "groupG","groupH","groupI","groupJ","groupK","groupL"]
 
 # ── Fetch & parse ────────────────────────────────────────────────────────────
+
+def parse_scores(scores_str):
+    """Parse '3-1' into (3, 1). Returns (0, 0) on failure."""
+    try:
+        parts = str(scores_str).split("-")
+        return int(parts[0]), int(parts[1])
+    except Exception:
+        return 0, 0
 
 def fetch_standings():
     """
@@ -27,63 +35,52 @@ def fetch_standings():
     live_standings:  groupX -> [1st, 2nd] based on current standings (None if no matches played)
     group_standings: groupX -> list of {team, mp, w, d, l, gf, ga, gd, pts} for all 4 teams
     """
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Referer": "https://www.fotmob.com/",
-        "Accept": "application/json",
-    }
-    resp = requests.get(API_URL, headers=headers, timeout=15)
-    resp.raise_for_status()
-    data = resp.json()
+    from fotmob import FotmobAPI
+    client = FotmobAPI()
+    raw = client.get_league_table(league_id=LEAGUE_ID)
 
     final_results   = {k: [None, None] for k in GROUP_KEYS}
     live_standings  = {k: [None, None] for k in GROUP_KEYS}
     group_standings = {k: [] for k in GROUP_KEYS}
 
-    # Fotmob structure: data["table"] is a list of group table objects
-    # Each has data["data"]["leagueName"] like "Group A" and data["data"]["table"]["all"]
-    table_sections = data.get("table", [])
-    if not table_sections:
-        # Sometimes nested under "standings" or "leagueOverviewTable"
-        table_sections = data.get("standings", data.get("leagueOverviewTable", []))
+    # raw is a list of group table objects
+    # Each entry: {"data": {"leagueName": "Group A", "table": {"all": [...]}}}
+    if not isinstance(raw, list):
+        raw = [raw]
 
     found = 0
-    for section in table_sections:
+    for section in raw:
         section_data = section.get("data", section)
-        league_name = section_data.get("leagueName", section_data.get("name", ""))
+        league_name  = section_data.get("leagueName", section_data.get("name", ""))
 
         m = re.search(r"Group\s+([A-L])\b", league_name, re.IGNORECASE)
         if not m:
             continue
 
         key = "group" + m.group(1).upper()
-        rows_raw = (section_data.get("table", {}).get("all")
-                    or section_data.get("table", {}).get("home")
-                    or section_data.get("rows")
-                    or [])
 
+        # Try "all" table first, fall back to other keys
+        table_obj = section_data.get("table", {})
+        rows_raw  = (table_obj.get("all") or table_obj.get("overall")
+                     or table_obj.get("home") or section_data.get("rows") or [])
+
+        SKIP = {"mp","p","pts","points","gp","played","team","name","club","#","pos",""}
         team_rows = []
         for entry in rows_raw:
-            name = entry.get("name", entry.get("teamName", ""))
-            if not name:
+            name = str(entry.get("name", entry.get("teamName", ""))).strip()
+            if not name or name.lower() in SKIP:
                 continue
 
-            mp   = entry.get("played", entry.get("mp", 0))
-            w    = entry.get("wins",   entry.get("w",  0))
-            d    = entry.get("draws",  entry.get("d",  0))
-            l    = entry.get("losses", entry.get("l",  0))
+            mp = entry.get("played", entry.get("mp", 0))
+            w  = entry.get("wins",   entry.get("w",  0))
+            d  = entry.get("draws",  entry.get("d",  0))
+            l  = entry.get("losses", entry.get("l",  0))
 
-            # Goals: sometimes "scoresStr" = "3-1", sometimes separate gf/ga fields
             gf, ga = 0, 0
             if "scoresStr" in entry:
-                parts = str(entry["scoresStr"]).split("-")
-                if len(parts) == 2:
-                    try:
-                        gf, ga = int(parts[0]), int(parts[1])
-                    except ValueError:
-                        pass
+                gf, ga = parse_scores(entry["scoresStr"])
             else:
-                gf = entry.get("gf", entry.get("goalsFor", 0))
+                gf = entry.get("gf", entry.get("goalsFor",     0))
                 ga = entry.get("ga", entry.get("goalsAgainst", 0))
 
             gd  = gf - ga
@@ -108,8 +105,7 @@ def fetch_standings():
 
     print(f"Found standings for {found}/12 groups.")
     if found == 0:
-        print("WARNING: No group data found. Top-level keys in response:")
-        print(list(data.keys()))
+        print("WARNING: No group data found. Raw response keys:", list(raw[0].keys()) if raw else "empty")
 
     return final_results, live_standings, group_standings
 
@@ -183,7 +179,7 @@ def patch_data_js(final_results, live_standings, group_standings):
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print(f"Fetching standings from Fotmob API (league 77)...")
+    print(f"Fetching standings from Fotmob (league ID {LEAGUE_ID})...")
     try:
         final_results, live_standings, group_standings = fetch_standings()
     except Exception as e:
