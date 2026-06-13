@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Cup 2026 Bracket Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:    #0B1F3A;
+      --red:     #C8102E;
+      --gold:    #F0A500;
+      --pitch:   #1A5E35;
+      --white:   #FFFFFF;
+      --off:     #F5F6F8;
+      --muted:   #6B7280;
+      --border:  #D1D9E0;
+      --correct: #1A5E35;
+      --wrong:   #C8102E;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--off); color: var(--navy); min-height: 100vh; }
+
+    header { background: var(--navy); padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.05em; color: var(--white); display: flex; align-items: center; gap: 10px; }
+    .logo span { color: var(--gold); }
+    nav { display: flex; gap: 4px; }
+    nav button { background: none; border: none; color: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 500; padding: 8px 14px; border-radius: 6px; cursor: pointer; transition: background 0.15s, color 0.15s; }
+    nav button:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+    nav button.active { background: var(--red); color: var(--white); }
+
+    .view { display: none; max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .view.active { display: block; }
+    h1 { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; letter-spacing: 0.04em; }
+    h1 span { color: var(--red); }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 4px; margin-bottom: 1.5rem; }
+
+    /* LEADERBOARD */
+    .lb-table { background: var(--white); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    .lb-row { display: grid; grid-template-columns: 52px 1fr 100px 100px 130px; align-items: center; padding: 0 1rem; height: 56px; border-bottom: 1px solid var(--border); transition: background 0.12s; }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-row.data-row:hover { background: var(--off); cursor: pointer; }
+    .lb-row.header-row { height: 40px; background: var(--navy); color: rgba(255,255,255,0.6); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+    .lb-row.rank-1 { background: #FFFBEB; }
+    .rank-badge { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; color: var(--muted); text-align: center; }
+    .rank-badge.r1 { color: #F0A500; } .rank-badge.r2 { color: #9CA3AF; } .rank-badge.r3 { color: #CD7F32; }
+    .player-name { font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--navy); color: var(--white); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; flex-shrink: 0; }
+    .avatar.r1 { background: var(--gold); color: var(--navy); }
+    .champ-pick { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+    .pts-cell { text-align: right; font-size: 0.9rem; }
+    .pts-cell .big { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--navy); }
+    .pts-cell .label { font-size: 0.7rem; color: var(--muted); display: block; }
+    .view-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; font-size: 0.78rem; font-weight: 500; cursor: pointer; color: var(--navy); transition: background 0.12s; white-space: nowrap; }
+    .view-btn:hover { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+    /* BRACKET PAGE */
+    .person-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; }
+    .person-chip { padding: 7px 16px; border-radius: 999px; border: 1px solid var(--border); background: var(--white); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.12s; }
+    .person-chip:hover { border-color: var(--navy); }
+    .person-chip.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+    .section-label { font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; letter-spacing: 0.06em; color: var(--white); background: var(--navy); padding: 6px 14px; border-radius: 6px; margin-bottom: 1rem; display: inline-block; }
+
+    /* SCORE CARDS */
+    .score-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 2rem; }
+    .score-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; text-align: center; }
+    .score-card .num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--navy); line-height: 1; }
+    .score-card .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .score-card .sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    /* GROUP STAGE */
+    .groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 10px; margin-bottom: 2.5rem; }
+    .group-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .group-card-header { background: var(--pitch); color: var(--white); font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; letter-spacing: 0.06em; padding: 6px 12px; }
+    .group-team { display: flex; align-items: center; justify-content: space-between; padding: 7px 12px; font-size: 0.84rem; border-bottom: 1px solid var(--border); }
+    .group-team:last-child { border-bottom: none; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot.correct { background: var(--correct); } .dot.wrong { background: var(--wrong); } .dot.pending { background: #C5CBD3; }
+
+    /* BRACKET TREE */
+    .bracket-scroll { overflow-x: auto; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    .bracket-tree { display: flex; align-items: stretch; position: relative; min-width: 860px; }
+    .b-round { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+    .b-round-label { font-family: 'Bebas Neue', sans-serif; font-size: 0.8rem; letter-spacing: 0.07em; color: var(--muted); text-align: center; padding: 6px 4px 10px; white-space: nowrap; }
+    .b-slots { flex: 1; display: flex; flex-direction: column; }
+    .b-match-group { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; }
+    .b-team { margin: 2px 4px 2px 8px; padding: 5px 8px; background: var(--white); border: 1.5px solid var(--border); border-radius: 5px; font-size: 0.72rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; z-index: 1; }
+    .b-team.winner { background: #EDF7F1; border-color: #52B788; color: var(--correct); font-weight: 600; }
+    .b-team.loser  { color: #A0A8B2; background: #F9FAFB; }
+    .b-team.empty  { color: #C5CBD3; border-style: dashed; font-style: italic; }
+    .b-pts { font-size: 0.6rem; color: var(--correct); margin-left: 4px; font-weight: 700; }
+    .b-svg { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+    .b-champ-col { flex: 0 0 120px; display: flex; flex-direction: column; align-items: stretch; padding-left: 8px; }
+    .b-champ-box { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .champ-card { background: var(--white); border: 2px solid var(--gold); border-radius: 10px; padding: 12px; text-align: center; width: 100%; }
+    .champ-card.won { background: #FFFBEB; }
+    .champ-card .trophy { font-size: 1.6rem; }
+    .champ-card .clbl { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-top: 4px; }
+    .champ-card .cteam { font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 0.04em; margin-top: 2px; }
+
+    @media (max-width: 600px) {
+      .lb-row { grid-template-columns: 44px 1fr 80px 100px; }
+      .lb-row .col-correct { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚽ WC<span>2026</span> Picks</div>
+  <nav>
+    <button class="active" data-view="leaderboard">Leaderboard</button>
+    <button data-view="brackets">Brackets</button>
+  </nav>
+</header>
+
+<div id="leaderboard" class="view active">
+  <h1>Group <span>Standings</span></h1>
+  <p class="subtitle" id="lb-subtitle"></p>
+  <div class="lb-table">
+    <div class="lb-row header-row">
+      <div>#</div><div>Player</div>
+      <div class="pts-cell" style="text-align:right">Points</div>
+      <div class="col-correct pts-cell" style="text-align:right">Correct</div>
+      <div class="pts-cell" style="text-align:right">Champion Pick</div>
+    </div>
+    <div id="lb-body"></div>
+  </div>
+</div>
+
+<div id="brackets" class="view">
+  <div class="person-selector" id="person-tabs"></div>
+  <div id="bracket-body"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="scoring.js"></script>
+<script>
+var GROUPS = ["groupA","groupB","groupC","groupD","groupE","groupF","groupG","groupH","groupI","groupJ","groupK","groupL"];
+var GROUP_LABELS = {groupA:"Group A",groupB:"Group B",groupC:"Group C",groupD:"Group D",groupE:"Group E",groupF:"Group F",groupG:"Group G",groupH:"Group H",groupI:"Group I",groupJ:"Group J",groupK:"Group K",groupL:"Group L"};
+
+// NAV
+document.querySelectorAll('nav button').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('nav button').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.view).classList.add('active');
+  });
+});
+
+// LEADERBOARD
+function initLeaderboard() {
+  var board = getLeaderboard();
+  var updated = (typeof LAST_UPDATED !== 'undefined' && LAST_UPDATED !== 'never') ? ' · standings updated ' + LAST_UPDATED : '';
+  document.getElementById('lb-subtitle').textContent = board.length + ' player' + (board.length !== 1 ? 's' : '') + ' · group stage in progress' + updated;
+  var body = document.getElementById('lb-body');
+  body.innerHTML = '';
+  board.forEach(function(p) {
+    var s = p.score;
+    var correct = Object.values(s.breakdown).reduce(function(a,b){ return a + b.correct; }, 0);
+    var row = document.createElement('div');
+    row.className = 'lb-row data-row' + (p.rank === 1 ? ' rank-1' : '');
+    row.innerHTML =
+      '<div class="rank-badge ' + (p.rank <= 3 ? 'r'+p.rank : '') + '">' + p.rank + '</div>' +
+      '<div class="player-name">' +
+        '<div class="avatar ' + (p.rank===1?'r1':'') + '">' + p.name.slice(0,2).toUpperCase() + '</div>' +
+        '<div><div>' + p.name + '</div><div class="champ-pick">🏆 ' + p.champion + '</div></div>' +
+      '</div>' +
+      '<div class="pts-cell"><span class="big">' + s.total + '</span><span class="label">pts</span></div>' +
+      '<div class="col-correct pts-cell"><span class="big">' + correct + '</span><span class="label">correct</span></div>' +
+      '<div class="pts-cell"><button class="view-btn" onclick="showBracket(\'' + p.id + '\')">View bracket →</button></div>';
+    body.appendChild(row);
+  });
+}
+
+// BRACKET
+var currentPerson = PARTICIPANTS[0].id;
+
+function showBracket(id) {
+  currentPerson = id;
+  document.querySelectorAll('nav button').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  document.querySelector('[data-view="brackets"]').classList.add('active');
+  document.getElementById('brackets').classList.add('active');
+  document.querySelectorAll('.person-chip').forEach(function(c){ c.classList.toggle('active', c.dataset.id === id); });
+  renderBracket(id);
+}
+
+function renderBracket(personId) {
+  var picks = BRACKET_PICKS[personId];
+  var score = computeScore(personId);
+  var body = document.getElementById('bracket-body');
+  if (!picks || !score) {
+    body.innerHTML = '<p style="color:var(--muted);padding:2rem 0">No bracket data yet.</p>';
+    return;
+  }
+  var person = PARTICIPANTS.find(function(p){ return p.id === personId; });
+  var bd = score.breakdown;
+  var knockoutPts = bd.roundOf32.pts + bd.roundOf16.pts + bd.quarterFinal.pts + bd.semiFinal.pts;
+  var knockoutCorrect = bd.roundOf32.correct + bd.roundOf16.correct + bd.quarterFinal.correct + bd.semiFinal.correct;
+
+  var html = '<h2 style="font-family:\'Bebas Neue\',sans-serif;font-size:1.8rem;letter-spacing:0.04em;margin-bottom:1rem">' + person.name + '\'s Bracket</h2>';
+
+  html += '<div class="score-summary">' +
+    '<div class="score-card"><div class="num">' + score.total + '</div><div class="lbl">Total Points</div></div>' +
+    '<div class="score-card"><div class="num">' + bd.groupStage.pts + '</div><div class="lbl">Group Stage</div><div class="sub">' + bd.groupStage.correct + ' correct</div></div>' +
+    '<div class="score-card"><div class="num">' + knockoutPts + '</div><div class="lbl">Knockout</div><div class="sub">' + knockoutCorrect + ' correct</div></div>' +
+    '<div class="score-card"><div class="num">' + bd.champion.pts + '</div><div class="lbl">Champion</div></div>' +
+  '</div>';
+
+  // Group stage
+  html += '<div class="section-label">Group Stage</div><div class="groups-grid">';
+  GROUPS.forEach(function(g) {
+    var picked = (picks.groupStage && picks.groupStage[g]) ? picks.groupStage[g] : [];
+    var act = (ACTUAL_RESULTS[g] || []).filter(Boolean);
+    var complete = act.length >= 2;
+    html += '<div class="group-card"><div class="group-card-header">' + GROUP_LABELS[g] + '</div>';
+    picked.forEach(function(team) {
+      var s = complete ? (act.some(function(a){ return normalize(a) === normalize(team); }) ? 'correct' : 'wrong') : 'pending';
+      html += '<div class="group-team"><span>' + team + '</span><span class="dot ' + s + '"></span></div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // Knockout bracket
+  html += '<div class="section-label" style="margin-bottom:1.5rem">Knockout Bracket</div>';
+  html += buildBracketHTML(picks);
+
+  body.innerHTML = html;
+  setTimeout(drawLines, 50);
+}
+
+function buildBracketHTML(picks) {
+  var rounds = [
+    { key: 'roundOf32',    label: 'Round of 32', n: 16, pts: SCORING.roundOf32 },
+    { key: 'roundOf16',    label: 'Round of 16', n: 8,  pts: SCORING.roundOf16 },
+    { key: 'quarterFinal', label: 'Quarters',    n: 4,  pts: SCORING.quarterFinal },
+    { key: 'semiFinal',    label: 'Semis',       n: 2,  pts: SCORING.semiFinal },
+  ];
+
+  var html = '<div class="bracket-scroll"><div class="bracket-tree" id="btree">';
+
+  rounds.forEach(function(round, ri) {
+    html += '<div class="b-round" id="bround-' + ri + '"><div class="b-round-label">' + round.label + '</div><div class="b-slots" id="bslots-' + ri + '">';
+    for (var i = 1; i <= round.n; i++) {
+      var pick = (picks[round.key] && picks[round.key]['m' + i]) || null;
+      var actual = (ACTUAL_RESULTS[round.key] && ACTUAL_RESULTS[round.key]['m' + i]) || null;
+      var cls = !pick ? 'empty' : (!actual ? '' : (normalize(pick) === normalize(actual) ? 'winner' : 'loser'));
+      var pts = (actual && normalize(pick) === normalize(actual)) ? '<span class="b-pts">+' + round.pts + '</span>' : '';
+      html += '<div class="b-match-group" data-ri="' + ri + '" data-mi="' + (i-1) + '">' +
+        '<div class="b-team ' + cls + '">' + (pick || '—') + pts + '</div>' +
+      '</div>';
+    }
+    html += '</div></div>';
+  });
+
+  // Champion
+  var champPick = picks.champion || null;
+  var champActual = ACTUAL_RESULTS.champion || null;
+  var champWon = champActual && champPick && normalize(champPick) === normalize(champActual);
+  var champPts = champWon
+    ? '<div style="font-size:0.65rem;color:var(--correct);font-weight:700;margin-top:4px">+' + (SCORING.final + SCORING.champion) + 'pts</div>'
+    : (champActual ? '<div style="font-size:0.65rem;color:var(--wrong);margin-top:4px">' + champActual + ' won</div>' : '');
+
+  html += '<div class="b-champ-col"><div class="b-round-label" style="text-align:center">Final</div><div class="b-champ-box">' +
+    '<div class="champ-card' + (champWon ? ' won' : '') + '">' +
+      '<div class="trophy">🏆</div><div class="clbl">Champion</div>' +
+      '<div class="cteam">' + (champPick || '—') + '</div>' + champPts +
+    '</div></div></div>';
+
+  html += '<svg class="b-svg" id="bsvg" xmlns="http://www.w3.org/2000/svg"></svg>';
+  html += '</div></div>';
+  return html;
+}
+
+function drawLines() {
+  var tree = document.getElementById('btree');
+  var svg = document.getElementById('bsvg');
+  if (!tree || !svg) return;
+  svg.innerHTML = '';
+  var treeRect = tree.getBoundingClientRect();
+  var rounds = tree.querySelectorAll('.b-slots');
+
+  for (var ri = 0; ri < rounds.length - 1; ri++) {
+    var curMatches = rounds[ri].querySelectorAll('.b-match-group');
+    var nextMatches = rounds[ri + 1].querySelectorAll('.b-match-group');
+    for (var ni = 0; ni < nextMatches.length; ni++) {
+      var a = curMatches[ni * 2];
+      var b = curMatches[ni * 2 + 1];
+      var c = nextMatches[ni];
+      if (!a || !b || !c) continue;
+      var aR = a.querySelector('.b-team').getBoundingClientRect();
+      var bR = b.querySelector('.b-team').getBoundingClientRect();
+      var cR = c.querySelector('.b-team').getBoundingClientRect();
+      var x1 = aR.right - treeRect.left;
+      var y1 = aR.top + aR.height / 2 - treeRect.top;
+      var y2 = bR.top + bR.height / 2 - treeRect.top;
+      var xMid = (aR.right + cR.left) / 2 - treeRect.left;
+      var x3 = cR.left - treeRect.left;
+      var y3 = cR.top + cR.height / 2 - treeRect.top;
+      var d = 'M' + x1 + ',' + y1 + ' H' + xMid + ' V' + y2 + ' H' + x1 + ' M' + xMid + ',' + ((y1+y2)/2) + ' H' + x3;
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', '#C5D0DC');
+      path.setAttribute('stroke-width', '1.5');
+      svg.appendChild(path);
+    }
+  }
+
+  // Line from semis to champ box
+  var lastSlots = rounds[rounds.length - 1].querySelectorAll('.b-match-group');
+  var champBox = document.querySelector('.b-champ-box .champ-card');
+  if (lastSlots.length >= 2 && champBox) {
+    var s1 = lastSlots[0].querySelector('.b-team').getBoundingClientRect();
+    var s2 = lastSlots[1].querySelector('.b-team').getBoundingClientRect();
+    var cB = champBox.getBoundingClientRect();
+    var lx1 = s1.right - treeRect.left;
+    var ly1 = s1.top + s1.height / 2 - treeRect.top;
+    var ly2 = s2.top + s2.height / 2 - treeRect.top;
+    var lxMid = (s1.right + cB.left) / 2 - treeRect.left;
+    var lx3 = cB.left - treeRect.left;
+    var ly3 = cB.top + cB.height / 2 - treeRect.top;
+    var d2 = 'M' + lx1 + ',' + ly1 + ' H' + lxMid + ' V' + ly2 + ' H' + lx1 + ' M' + lxMid + ',' + ((ly1+ly2)/2) + ' H' + lx3 + ',' + ly3;
+    var p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p2.setAttribute('d', d2);
+    p2.setAttribute('fill', 'none');
+    p2.setAttribute('stroke', '#C5D0DC');
+    p2.setAttribute('stroke-width', '1.5');
+    svg.appendChild(p2);
+  }
+}
+
+window.addEventListener('resize', function() {
+  if (document.getElementById('brackets').classList.contains('active')) drawLines();
+});
+
+function initBrackets() {
+  var tabs = document.getElementById('person-tabs');
+  tabs.innerHTML = '';
+  PARTICIPANTS.forEach(function(p) {
+    var chip = document.createElement('button');
+    chip.className = 'person-chip' + (p.id === currentPerson ? ' active' : '');
+    chip.dataset.id = p.id;
+    chip.textContent = p.name;
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('.person-chip').forEach(function(c){ c.classList.remove('active'); });
+      chip.classList.add('active');
+      currentPerson = p.id;
+      renderBracket(p.id);
+    });
+    tabs.appendChild(chip);
+  });
+  renderBracket(currentPerson);
+}
+
+initLeaderboard();
+initBrackets();
+</script>
+</body>
+</html>
