@@ -567,23 +567,25 @@ function initStandings(){
 // ══════════════════════════════════════════════════════════════
 //  TODAY'S MATCHES SIDEBAR
 // ══════════════════════════════════════════════════════════════
-var sidebarFetched=false;
+var sidebarRefreshTimer=null;
 
 function toggleSidebar(){
   var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebar-overlay');
   var opening=!sb.classList.contains('open');
   sb.classList.toggle('open');
   ov.classList.toggle('open');
-  if(opening&&!sidebarFetched){sidebarFetched=true;fetchGames();}
+  if(opening){fetchGames();}else{clearTimeout(sidebarRefreshTimer);}
 }
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebar-overlay').classList.remove('open');
+  clearTimeout(sidebarRefreshTimer);
 }
 
 function fetchGames(){
+  clearTimeout(sidebarRefreshTimer);
   var el=document.getElementById('games-list');
-  el.innerHTML='<div class="sidebar-empty">Loading…</div>';
+  if(!el.children.length)el.innerHTML='<div class="sidebar-empty">Loading…</div>';
   var now=new Date();
   var dates=[];
   for(var i=0;i<2;i++){
@@ -600,6 +602,12 @@ function fetchGames(){
     });
     events.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
     renderGames(events);
+    var hasLive=events.some(function(e){return e.status&&e.status.type&&e.status.type.name==='STATUS_IN_PROGRESS';});
+    var allFinal=events.length>0&&events.every(function(e){return e.status&&e.status.type&&(e.status.type.name==='STATUS_FINAL'||e.status.type.name==='STATUS_POSTPONED');});
+    var sb=document.getElementById('sidebar');
+    if(!allFinal&&sb&&sb.classList.contains('open')){
+      sidebarRefreshTimer=setTimeout(fetchGames,hasLive?30000:60000);
+    }
   }).catch(function(){
     el.innerHTML='<div class="sidebar-empty">Could not load matches. Check your connection.</div>';
   });
