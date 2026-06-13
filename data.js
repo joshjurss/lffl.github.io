@@ -231,7 +231,7 @@ const BRACKET_PICKS = {
     roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
     quarterFinal: { m1:null,m2:null,m3:null,m4:null },
     semiFinal:    { m1:null,m2:null },
-    champion:     null,
+    champion:     "Brazil",
   },
 
 };
@@ -260,7 +260,7 @@ BRACKET_PICKS.ryan = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "Brazil",
 };
 
 PARTICIPANTS.push({ id: "jacob", name: "Jacob" });
@@ -284,7 +284,7 @@ BRACKET_PICKS.jacob = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "France",
 };
 
 PARTICIPANTS.push({ id: "baumann", name: "Baumann" });
@@ -308,7 +308,7 @@ BRACKET_PICKS.baumann = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "Portugal",
 };
 
 PARTICIPANTS.push({ id: "chris", name: "Chris" });
@@ -332,7 +332,7 @@ BRACKET_PICKS.chris = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "Spain",
 };
 
 PARTICIPANTS.push({ id: "justin", name: "Justin" });
@@ -356,7 +356,7 @@ BRACKET_PICKS.justin = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "Brazil",
 };
 
 PARTICIPANTS.push({ id: "ben", name: "Ben" });
@@ -380,7 +380,7 @@ BRACKET_PICKS.ben = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "Argentina",
 };
 
 PARTICIPANTS.push({ id: "zylka", name: "Zylka" });
@@ -404,7 +404,7 @@ BRACKET_PICKS.zylka = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "Spain",
 };
 
 PARTICIPANTS.push({ id: "andrew", name: "Andrew" });
@@ -428,7 +428,7 @@ BRACKET_PICKS.andrew = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "United States",
 };
 
 PARTICIPANTS.push({ id: "andy", name: "Andy" });
@@ -452,7 +452,7 @@ BRACKET_PICKS.andy = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "Spain",
 };
 
 PARTICIPANTS.push({ id: "larry", name: "Larry" });
@@ -476,7 +476,7 @@ BRACKET_PICKS.larry = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "France",
 };
 
 PARTICIPANTS.push({ id: "joshz", name: "Josh Z" });
@@ -500,5 +500,53 @@ BRACKET_PICKS.joshz = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null },
   semiFinal:    { m1:null,m2:null },
-  champion:     null,
+  champion:     "France",
+};
+
+PARTICIPANTS.push({ id: "jackie", name: "Jackie" });
+
+BRACKET_PICKS.jackie = {
+  groupStage: {
+    groupA: ["South Korea", "Mexico", "Czech Republic"],
+    groupB: ["Switzerland", "Canada", "Bosnia and Herzegovina"],
+    groupC: ["Brazil", "Scotland", "Haiti"],
+    groupD: ["United States", "Australia", "Paraguay"],
+    groupE: ["Germany", "Ecuador"],
+    groupF: ["Sweden", "Netherlands", "Japan"],
+    groupG: ["New Zealand", "Belgium", "Egypt"],
+    groupH: ["Spain", "Uruguay"],
+    groupI: ["Norway", "France", "Senegal"],
+    groupJ: ["Argentina", "Austria"],
+    groupK: ["Colombia", "Portugal"],
+    groupL: ["England", "Croatia", "Ghana"],
+  },
+  roundOf32:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null },
+  roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
+  quarterFinal: { m1:null,m2:null,m3:null,m4:null },
+  semiFinal:    { m1:null,m2:null },
+  champion:     "Norway",
+};
+
+PARTICIPANTS.push({ id: "jamie", name: "Jamie" });
+
+BRACKET_PICKS.jamie = {
+  groupStage: {
+    groupA: ["Mexico", "South Korea", "Czech Republic"],
+    groupB: ["Switzerland", "Qatar", "Canada"],
+    groupC: ["Brazil", "Morocco", "Scotland"],
+    groupD: ["United States", "Australia", "Turkey"],
+    groupE: ["Germany", "Ecuador"],
+    groupF: ["Netherlands", "Japan", "Tunisia"],
+    groupG: ["Belgium", "Iran", "Egypt"],
+    groupH: ["Spain", "Uruguay"],
+    groupI: ["France", "Senegal", "Norway"],
+    groupJ: ["Argentina", "Austria", "Algeria"],
+    groupK: ["Portugal", "Colombia"],
+    groupL: ["England", "Croatia"],
+  },
+  roundOf32:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null },
+  roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
+  quarterFinal: { m1:null,m2:null,m3:null,m4:null },
+  semiFinal:    { m1:null,m2:null },
+  champion:     "Ecuador",
 };
