@@ -108,11 +108,13 @@
     .round-dot-row{display:flex;gap:5px;align-items:center;justify-content:center;margin-top:4px;}
     .round-dot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:background .15s;}
     .round-dot.active{background:var(--navy);}
-    .round-picks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:1.5rem;}
-    .pick-item{background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;display:flex;align-items:center;gap:6px;font-size:.84rem;font-weight:500;}
-    .pick-item.winner{border-color:#52B788;background:#EDF7F1;color:var(--correct);}
-    .pick-item.loser{border-color:#FECACA;background:#FEF2F2;color:#991B1B;}
-    .pick-item.empty{color:#C5CBD3;border-style:dashed;font-style:italic;}
+    .matchup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:1.5rem;}
+    .matchup-card{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+    .matchup-team{display:flex;align-items:center;gap:7px;padding:9px 12px;font-size:.84rem;font-weight:500;color:#374151;}
+    .matchup-team+.matchup-team{border-top:1px dashed var(--border);}
+    .matchup-team.winner{background:#EDF7F1;color:var(--correct);}
+    .matchup-team.loser{color:#9CA3AF;}
+    .matchup-team.empty{color:#C5CBD3;font-style:italic;}
     .pick-pts{font-size:.7rem;font-weight:700;color:var(--correct);margin-left:auto;}
     .champ-solo{display:flex;justify-content:center;padding:2rem 0;}
     .champ-solo .champ-card{max-width:200px;}
@@ -312,6 +314,9 @@ BRACKET_PICKS.larry={groupStage:{groupA:["Mexico","Czech Republic","South Korea"
 
 PARTICIPANTS.push({id:"joshz",name:"Josh Z"});
 BRACKET_PICKS.joshz={groupStage:{groupA:["Mexico","Czech Republic","South Korea"],groupB:["Switzerland","Canada","Qatar"],groupC:["Brazil","Morocco","Scotland"],groupD:["United States","Turkey"],groupE:["Germany","Ecuador","Ivory Coast"],groupF:["Netherlands","Tunisia","Sweden"],groupG:["Belgium","Iran","Egypt"],groupH:["Spain","Uruguay"],groupI:["France","Senegal","Norway"],groupJ:["Argentina","Austria","Algeria"],groupK:["Portugal","Colombia"],groupL:["England","Croatia"]},roundOf32:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null,m17:null,m18:null,m19:null,m20:null,m21:null,m22:null,m23:null,m24:null,m25:null,m26:null,m27:null,m28:null,m29:null,m30:null,m31:null,m32:null},roundOf16:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null},quarterFinal:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null},semiFinal:{m1:null,m2:null,m3:null,m4:null},final:{m1:null,m2:null},champion:null};
+
+PARTICIPANTS.push({id:"jackie",name:"Jackie"});
+BRACKET_PICKS.jackie={groupStage:{groupA:["South Korea","Mexico","Czech Republic"],groupB:["Switzerland","Canada","Bosnia and Herzegovina"],groupC:["Brazil","Scotland","Haiti"],groupD:["United States","Australia","Paraguay"],groupE:["Germany","Ecuador"],groupF:["Sweden","Netherlands","Japan"],groupG:["New Zealand","Belgium","Egypt"],groupH:["Spain","Uruguay"],groupI:["Norway","France","Senegal"],groupJ:["Argentina","Austria"],groupK:["Colombia","Portugal"],groupL:["England","Croatia","Ghana"]},roundOf32:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null,m17:null,m18:null,m19:null,m20:null,m21:null,m22:null,m23:null,m24:null,m25:null,m26:null,m27:null,m28:null,m29:null,m30:null,m31:null,m32:null},roundOf16:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null},quarterFinal:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null},semiFinal:{m1:null,m2:null,m3:null,m4:null},final:{m1:null,m2:null},champion:null};
 
 PARTICIPANTS.push({id:"jamie",name:"Jamie"});
 BRACKET_PICKS.jamie={groupStage:{groupA:["Mexico","South Korea","Czech Republic"],groupB:["Switzerland","Qatar","Canada"],groupC:["Brazil","Morocco","Scotland"],groupD:["United States","Australia","Turkey"],groupE:["Germany","Ecuador"],groupF:["Netherlands","Japan","Tunisia"],groupG:["Belgium","Iran","Egypt"],groupH:["Spain","Uruguay"],groupI:["France","Senegal","Norway"],groupJ:["Argentina","Austria","Algeria"],groupK:["Portugal","Colombia"],groupL:["England","Croatia"]},roundOf32:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null,m17:null,m18:null,m19:null,m20:null,m21:null,m22:null,m23:null,m24:null,m25:null,m26:null,m27:null,m28:null,m29:null,m30:null,m31:null,m32:null},roundOf16:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null},quarterFinal:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null},semiFinal:{m1:null,m2:null,m3:null,m4:null},final:{m1:null,m2:null},champion:null};
@@ -514,17 +519,22 @@ function renderKnockoutRound(picks){
   }else{
     var roundActuals=Object.values(ACTUAL_RESULTS[round.key]||{}).filter(Boolean);
     var hasResults=roundActuals.length>0;
-    var html='<div class="round-picks-grid">';
-    for(var i=1;i<=round.n;i++){
-      var pick=(picks[round.key]&&picks[round.key]['m'+i])||null;
-      var correct=pick&&hasResults&&roundActuals.some(function(a){return normalize(pick)===normalize(a);});
-      var cls=!pick?'empty':(!hasResults?'':(correct?'winner':'loser'));
-      var pts=correct&&round.pts?'<span class="pick-pts">+'+round.pts+'</span>':'';
-      html+='<div class="pick-item '+cls+'">'+(pick?getFlag(pick)+' '+pick:'—')+pts+'</div>';
+    var html='<div class="matchup-grid">';
+    for(var i=1;i<=round.n;i+=2){
+      var pA=(picks[round.key]&&picks[round.key]['m'+i])||null;
+      var pB=(picks[round.key]&&picks[round.key]['m'+(i+1)])||null;
+      html+='<div class="matchup-card">'+matchupTeamRow(pA,hasResults,roundActuals,round.pts)+matchupTeamRow(pB,hasResults,roundActuals,round.pts)+'</div>';
     }
     html+='</div>';
     container.innerHTML=html;
   }
+}
+
+function matchupTeamRow(pick,hasResults,actuals,pts){
+  var correct=pick&&hasResults&&actuals.some(function(a){return normalize(pick)===normalize(a);});
+  var cls=!pick?'empty':(!hasResults?'':(correct?'winner':'loser'));
+  var ptsHtml=correct&&pts?'<span class="pick-pts">+'+pts+'</span>':'';
+  return'<div class="matchup-team '+cls+'">'+(pick?getFlag(pick)+' '+pick:'—')+ptsHtml+'</div>';
 }
 
 
@@ -584,11 +594,14 @@ function renderWCRound(){
     var champ=ACTUAL_RESULTS.champion||null;
     container.innerHTML='<div class="champ-solo"><div class="champ-card'+(champ?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">World Cup Champion</div><div class="cteam">'+(champ||'TBD')+'</div></div></div>';
   }else{
-    var html='<div class="round-picks-grid">';
-    for(var i=1;i<=round.n;i++){
-      var team=(ACTUAL_RESULTS[round.key]&&ACTUAL_RESULTS[round.key]['m'+i])||null;
-      var flag=team?getFlag(team):'';
-      html+='<div class="pick-item'+(team?'':' empty')+'">'+(team?flag+' '+team:'TBD')+'</div>';
+    var html='<div class="matchup-grid">';
+    for(var i=1;i<=round.n;i+=2){
+      var tA=(ACTUAL_RESULTS[round.key]&&ACTUAL_RESULTS[round.key]['m'+i])||null;
+      var tB=(ACTUAL_RESULTS[round.key]&&ACTUAL_RESULTS[round.key]['m'+(i+1)])||null;
+      html+='<div class="matchup-card">'+
+        '<div class="matchup-team'+(tA?'':' empty')+'">'+(tA?getFlag(tA)+' '+tA:'TBD')+'</div>'+
+        '<div class="matchup-team'+(tB?'':' empty')+'">'+(tB?getFlag(tB)+' '+tB:'TBD')+'</div>'+
+        '</div>';
     }
     html+='</div>';
     container.innerHTML=html;
