@@ -48,7 +48,7 @@
     h1 span{color:var(--red);}
     .subtitle{color:var(--muted);font-size:.9rem;margin-top:4px;margin-bottom:1.5rem;}
     .lb-table{background:var(--white);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
-    .lb-row{display:grid;grid-template-columns:52px 1fr 110px 160px;align-items:center;padding:0 1.25rem 0 0;height:68px;border-bottom:1px solid var(--border);transition:background .15s;border-left:4px solid transparent;}
+    .lb-row{display:grid;grid-template-columns:52px 1fr 110px;align-items:center;padding:0 1.25rem 0 0;height:68px;border-bottom:1px solid var(--border);transition:background .15s;border-left:4px solid transparent;}
     .lb-row:last-child{border-bottom:none;}
     .lb-row.data-row:hover{background:var(--off);cursor:pointer;}
     .lb-row.header-row{height:38px;background:var(--navy);color:rgba(255,255,255,.55);font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-left:4px solid var(--navy);}
@@ -125,6 +125,9 @@
     .pick-pts{font-size:.7rem;font-weight:700;color:var(--correct);margin-left:auto;}
     .champ-solo{display:flex;justify-content:center;padding:2rem 0;}
     .champ-solo .champ-card{max-width:200px;}
+    .flag-emoji{display:none;}
+    .flag-img{display:inline;}
+    @media(max-width:600px){.flag-img{display:none;}.flag-emoji{display:inline;}}
     .games-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:var(--white);font-family:'Inter',sans-serif;font-size:.8rem;font-weight:500;padding:6px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:background .15s;margin-left:8px;}
     .games-btn:hover{background:rgba(255,255,255,.22);}
     .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:199;cursor:pointer;}
@@ -208,7 +211,6 @@
     <div class="lb-row header-row">
       <div>#</div><div>Player</div>
       <div class="pts-cell" style="text-align:right">Points</div>
-      <div class="pts-cell lb-champ-col" style="text-align:right">Champion Pick</div>
     </div>
     <div id="lb-body"></div>
   </div>
@@ -333,7 +335,7 @@ function initLeaderboard(){
       '<div class="player-name"><div class="'+avCls+'">'+p.name.slice(0,2).toUpperCase()+'</div>'+
       '<div><div>'+p.name+'</div><div class="champ-pick">'+getFlag(p.champion)+' '+p.champion+'</div></div></div>'+
       '<div class="pts-cell"><span class="big">'+s.total+'</span><span class="label">pts</span></div>'+
-      '<div class="lb-champ-col lb-champ-cell"><span class="lb-champ-flag">'+getFlag(p.champion)+'</span><span class="lb-champ-name">'+p.champion+'</span><button class="view-btn" onclick="event.stopPropagation();showBracket(\''+p.id+'\')">View →</button></div>';
+      '';
     body.appendChild(row);
   });
 }
@@ -534,12 +536,28 @@ var FLAG_CODE={
   'england':'gb-eng','croatia':'hr','panama':'pa','ghana':'gh',
   'iran':'ir','new zealand':'nz','iraq':'iq','jordan':'jo','cape verde':'cv',
 };
+var FLAG_EMOJI={
+  'mexico':'🇲🇽','south korea':'🇰🇷','south africa':'🇿🇦','czechia':'🇨🇿','czech republic':'🇨🇿',
+  'canada':'🇨🇦','bosnia and herzegovina':'🇧🇦','bosnia-herzegovina':'🇧🇦','qatar':'🇶🇦','switzerland':'🇨🇭',
+  'brazil':'🇧🇷','morocco':'🇲🇦','haiti':'🇭🇹','scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'united states':'🇺🇸','usa':'🇺🇸','australia':'🇦🇺','paraguay':'🇵🇾','turkey':'🇹🇷','türkiye':'🇹🇷',
+  'germany':'🇩🇪','ecuador':'🇪🇨','ivory coast':'🇨🇮','côte d\'ivoire':'🇨🇮','curacao':'🇨🇼',
+  'netherlands':'🇳🇱','japan':'🇯🇵','tunisia':'🇹🇳','sweden':'🇸🇪',
+  'belgium':'🇧🇪','iran':'🇮🇷','egypt':'🇪🇬','new zealand':'🇳🇿',
+  'spain':'🇪🇸','uruguay':'🇺🇾','saudi arabia':'🇸🇦','cape verde':'🇨🇻',
+  'france':'🇫🇷','senegal':'🇸🇳','norway':'🇳🇴','iraq':'🇮🇶',
+  'argentina':'🇦🇷','austria':'🇦🇹','algeria':'🇩🇿','jordan':'🇯🇴',
+  'portugal':'🇵🇹','colombia':'🇨🇴','uzbekistan':'🇺🇿','dr congo':'🇨🇩','congo dr':'🇨🇩',
+  'england':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','croatia':'🇭🇷','panama':'🇵🇦','ghana':'🇬🇭',
+};
 function getFlag(name,size){
   if(!name)return'';
-  var code=FLAG_CODE[name.toLowerCase()];
-  if(!code)return'';
+  var key=name.toLowerCase();
+  var code=FLAG_CODE[key];
+  var emoji=FLAG_EMOJI[key]||'';
   var px=size||20;
-  return'<img src="https://flagcdn.com/'+px+'x'+Math.round(px*.75)+'/'+code+'.png" style="width:'+px+'px;height:'+Math.round(px*.75)+'px;border-radius:2px;vertical-align:middle;display:inline-block" alt="'+name+'">';
+  var img=code?'<img src="https://flagcdn.com/'+px+'x'+Math.round(px*.75)+'/'+code+'.png" style="width:'+px+'px;height:'+Math.round(px*.75)+'px;border-radius:2px;vertical-align:middle" alt="'+name+'">':'';
+  return'<span class="flag-img">'+img+'</span><span class="flag-emoji">'+emoji+'</span>';
 }
 
 function initStandings(){
