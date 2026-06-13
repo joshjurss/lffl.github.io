@@ -80,12 +80,21 @@ def fetch_standings():
         if len(mp_vals) == 4 and all(mp == 3 for mp in mp_vals) and len(teams) >= 2:
             final_results[key] = [teams[0], teams[1]]
 
+    # Compute best 8 third-place teams
+    third_place = []
+    for key, rows in group_standings.items():
+        if len(rows) >= 3 and rows[2]["mp"] > 0:
+            third_place.append(rows[2])
+    third_place.sort(key=lambda r: (-r["pts"], -r["gd"], -r["gf"]))
+    live_thirds = [r["team"] for r in third_place[:8]]
+
     print(f"Found standings for {found}/12 groups.")
     if found == 0:
         print("WARNING: No group data found.")
         print("Response keys:", list(data.keys()))
+    print(f"  Best third-place teams advancing: {live_thirds}")
 
-    return final_results, live_standings, group_standings
+    return final_results, live_standings, group_standings, live_thirds
 
 
 # ── Patch helpers ─────────────────────────────────────────────────────────────
@@ -126,7 +135,12 @@ def replace_between_markers(content, start_marker, end_marker, new_block, path):
         print(f"  SKIP: markers {start_marker!r} not found in {path}")
     return new_content
 
-def patch_file(path, final_results, live_standings, group_standings, ts):
+def build_thirds_js(live_thirds):
+    if not live_thirds:
+        return ""
+    return "  " + ", ".join(f'"{t}"' for t in live_thirds)
+
+def patch_file(path, final_results, live_standings, group_standings, live_thirds, ts):
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -151,6 +165,13 @@ def patch_file(path, final_results, live_standings, group_standings, ts):
         build_group_standings_js(group_standings),
         path
     )
+    content = replace_between_markers(
+        content,
+        "// __LIVE_THIRDS_START__",
+        "// __LIVE_THIRDS_END__",
+        build_thirds_js(live_thirds),
+        path
+    )
 
     content = re.sub(r'var LAST_UPDATED = ".*?";',
                      f'var LAST_UPDATED = "{ts}";', content)
@@ -159,10 +180,10 @@ def patch_file(path, final_results, live_standings, group_standings, ts):
         f.write(content)
     print(f"  {path} patched.")
 
-def patch_all(final_results, live_standings, group_standings):
+def patch_all(final_results, live_standings, group_standings, live_thirds):
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    patch_file(DATA_JS,    final_results, live_standings, group_standings, ts)
-    patch_file(INDEX_HTML, final_results, live_standings, group_standings, ts)
+    patch_file(DATA_JS,    final_results, live_standings, group_standings, live_thirds, ts)
+    patch_file(INDEX_HTML, final_results, live_standings, group_standings, live_thirds, ts)
 
     for key in GROUP_KEYS:
         print(f"  {key}: final={final_results[key]}  live={live_standings[key]}  rows={len(group_standings[key])}")
@@ -173,9 +194,9 @@ def patch_all(final_results, live_standings, group_standings):
 if __name__ == "__main__":
     print(f"Fetching standings from ESPN API...")
     try:
-        final_results, live_standings, group_standings = fetch_standings()
+        final_results, live_standings, group_standings, live_thirds = fetch_standings()
     except Exception as e:
         print(f"ERROR fetching standings: {e}")
         sys.exit(1)
 
-    patch_all(final_results, live_standings, group_standings)
+    patch_all(final_results, live_standings, group_standings, live_thirds)

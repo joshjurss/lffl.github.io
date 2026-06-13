@@ -79,6 +79,12 @@ const LIVE_STANDINGS = {
 // __LIVE_STANDINGS_END__
 };
 
+// Best 8 third-place teams that currently qualify for the Round of 32
+const LIVE_THIRDS = [
+// __LIVE_THIRDS_START__
+// __LIVE_THIRDS_END__
+];
+
 // ── GROUP STANDINGS ───────────────────────────────────────────
 // Full standings table per group (updated hourly). Each entry:
 // {team, mp, w, d, l, gf, ga, gd, pts}

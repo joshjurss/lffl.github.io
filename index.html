@@ -184,6 +184,11 @@ var LIVE_STANDINGS = {
 // __LIVE_STANDINGS_END__
 };
 
+// Best 8 third-place teams that currently qualify for the Round of 32
+var LIVE_THIRDS = [];
+// __LIVE_THIRDS_START__
+// __LIVE_THIRDS_END__
+
 var ACTUAL_RESULTS = {
 // __ACTUAL_RESULTS_START__
   groupA: [null, null],
@@ -384,7 +389,9 @@ function renderBracket(personId){
     var hasLive=live.length>=2;
     html+='<div class="group-card"><div class="group-card-header">'+GROUP_LABELS[g]+'</div>';
     picked.forEach(function(team){
-      var s=hasLive?(live.some(function(a){return normalize(a)===normalize(team);})?'correct':'wrong'):'pending';
+      var inTop2=live.some(function(a){return normalize(a)===normalize(team);});
+      var inThirds=LIVE_THIRDS.some(function(a){return normalize(a)===normalize(team);});
+      var s=hasLive?(inTop2||inThirds?'correct':'wrong'):'pending';
       html+='<div class="group-team"><span>'+team+'</span><span class="dot '+s+'"></span></div>';
     });
     html+='</div>';
