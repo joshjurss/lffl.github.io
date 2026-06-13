@@ -118,6 +118,30 @@
     .pick-pts{font-size:.7rem;font-weight:700;color:var(--correct);margin-left:auto;}
     .champ-solo{display:flex;justify-content:center;padding:2rem 0;}
     .champ-solo .champ-card{max-width:200px;}
+    .games-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:var(--white);font-family:'Inter',sans-serif;font-size:.8rem;font-weight:500;padding:6px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:background .15s;margin-left:8px;}
+    .games-btn:hover{background:rgba(255,255,255,.22);}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:199;cursor:pointer;}
+    .sidebar-overlay.open{display:block;}
+    .sidebar{position:fixed;top:0;right:-340px;width:320px;max-width:100vw;height:100vh;background:var(--white);box-shadow:-4px 0 24px rgba(0,0,0,.18);z-index:200;transition:right .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
+    .sidebar.open{right:0;}
+    .sidebar-hd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:var(--white);flex-shrink:0;}
+    .sidebar-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.06em;}
+    .sidebar-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:1.1rem;cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1;}
+    .sidebar-close:hover{background:rgba(255,255,255,.12);}
+    .sidebar-body{flex:1;overflow-y:auto;padding:10px;}
+    .game-card{background:var(--off);border-radius:8px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--border);}
+    .game-card.live{border-color:#ef4444;background:#fff8f8;}
+    .game-card.final{opacity:.75;}
+    .game-meta{font-size:.7rem;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:#ef4444;animation:pulse 1s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+    .live-label{color:#ef4444;font-weight:700;font-size:.7rem;}
+    .game-team{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:.84rem;}
+    .game-name{flex:1;font-weight:500;}
+    .game-score{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:var(--muted);min-width:14px;text-align:right;}
+    .game-score.lead{color:var(--navy);}
+    .sidebar-empty{padding:1.5rem 1rem;color:var(--muted);font-style:italic;font-size:.88rem;}
+    @media(max-width:480px){.sidebar{width:100vw;right:-100vw;}}
     @media(max-width:600px){
       .lb-row{grid-template-columns:44px 1fr 72px 90px;}
       .col-correct{display:none;}
@@ -158,7 +182,16 @@
     <button data-view="brackets">Brackets</button>
     <button data-view="standings">World Cup Table</button>
   </nav>
+  <button class="games-btn" onclick="toggleSidebar()">📅 Matches</button>
 </header>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-hd">
+    <span class="sidebar-title">📅 Today's Matches</span>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <div class="sidebar-body" id="games-list"><div class="sidebar-empty">Loading…</div></div>
+</div>
 <div id="leaderboard" class="view active">
   <h1>Group <span>Standings</span></h1>
   <p class="subtitle" id="lb-subtitle"></p>
@@ -661,6 +694,87 @@ function initStandings(){
   });
   document.getElementById('wc-bracket-body').innerHTML=buildWCBracketHTML();
   renderWCRound();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TODAY'S MATCHES SIDEBAR
+// ══════════════════════════════════════════════════════════════
+var sidebarFetched=false;
+
+function toggleSidebar(){
+  var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebar-overlay');
+  var opening=!sb.classList.contains('open');
+  sb.classList.toggle('open');
+  ov.classList.toggle('open');
+  if(opening&&!sidebarFetched){sidebarFetched=true;fetchGames();}
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+function fetchGames(){
+  var el=document.getElementById('games-list');
+  el.innerHTML='<div class="sidebar-empty">Loading…</div>';
+  var now=new Date();
+  var dates=[];
+  for(var i=0;i<2;i++){
+    var d=new Date(now);d.setDate(d.getDate()+i);
+    dates.push(d.toISOString().slice(0,10).replace(/-/g,''));
+  }
+  Promise.all(dates.map(function(dt){
+    return fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+dt)
+      .then(function(r){return r.json();});
+  })).then(function(results){
+    var seen={},events=[];
+    results.forEach(function(data){
+      (data.events||[]).forEach(function(e){if(!seen[e.id]){seen[e.id]=true;events.push(e);}});
+    });
+    events.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+    renderGames(events);
+  }).catch(function(){
+    el.innerHTML='<div class="sidebar-empty">Could not load matches. Check your connection.</div>';
+  });
+}
+
+function renderGames(events){
+  var el=document.getElementById('games-list');
+  if(!events.length){el.innerHTML='<div class="sidebar-empty">No matches scheduled today.</div>';return;}
+  var html='';
+  var lastDate='';
+  events.forEach(function(event){
+    var comp=event.competitions&&event.competitions[0];if(!comp)return;
+    var home=comp.competitors.find(function(c){return c.homeAway==='home';})||comp.competitors[0];
+    var away=comp.competitors.find(function(c){return c.homeAway==='away';})||comp.competitors[1];
+    if(!home||!away)return;
+    var st=event.status&&event.status.type;
+    var stName=st?st.name:'';
+    var detail=st?st.shortDetail:'';
+    var isLive=stName==='STATUS_IN_PROGRESS';
+    var isFinal=stName==='STATUS_FINAL';
+    var isScheduled=!isLive&&!isFinal;
+    var gameDate=new Date(event.date);
+    var dateLabel=gameDate.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});
+    if(dateLabel!==lastDate){
+      html+='<div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 4px 4px">'+(lastDate===''?'':'<br>')+dateLabel+'</div>';
+      lastDate=dateLabel;
+    }
+    var homeName=home.team.displayName||home.team.name||'';
+    var awayName=away.team.displayName||away.team.name||'';
+    var hScore=home.score,aScore=away.score;
+    var hLead=!isScheduled&&parseInt(hScore||0)>parseInt(aScore||0);
+    var aLead=!isScheduled&&parseInt(aScore||0)>parseInt(hScore||0);
+    html+='<div class="game-card'+(isLive?' live':isFinal?' final':'')+'">';
+    html+='<div class="game-meta">';
+    if(isLive){html+='<span class="live-dot"></span><span class="live-label">LIVE</span><span>'+detail+'</span>';}
+    else if(isFinal){html+='<span style="font-weight:600">FT</span>';}
+    else{html+='<span>'+gameDate.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'</span>';}
+    html+='</div>';
+    html+='<div class="game-team">'+getFlag(homeName)+' <span class="game-name">'+homeName+'</span>'+(isScheduled?'':'<span class="game-score'+(hLead?' lead':'')+'">'+hScore+'</span>')+'</div>';
+    html+='<div class="game-team">'+getFlag(awayName)+' <span class="game-name">'+awayName+'</span>'+(isScheduled?'':'<span class="game-score'+(aLead?' lead':'')+'">'+aScore+'</span>')+'</div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
 }
 
 initLeaderboard();
