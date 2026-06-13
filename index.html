@@ -143,7 +143,7 @@
 // ══════════════════════════════════════════════════════════════
 //  DATA
 // ══════════════════════════════════════════════════════════════
-var LAST_UPDATED = "never";
+var LAST_UPDATED = "2026-06-13 04:28 UTC";
 
 var SCORING = {
   groupStage:1, roundOf32:1, roundOf16:2,
@@ -152,24 +152,52 @@ var SCORING = {
 
 var GROUP_STANDINGS = {
 // __GROUP_STANDINGS_START__
-  groupA:[],groupB:[],groupC:[],groupD:[],groupE:[],groupF:[],
-  groupG:[],groupH:[],groupI:[],groupJ:[],groupK:[],groupL:[]
+  groupA: [{team:"Mexico",mp:1,w:1,d:0,l:0,gf:2,ga:0,gd:2,pts:3},{team:"Czechia",mp:1,w:0,d:0,l:1,gf:1,ga:2,gd:-1,pts:0},{team:"South Korea",mp:1,w:1,d:0,l:0,gf:2,ga:1,gd:1,pts:3},{team:"South Africa",mp:1,w:0,d:0,l:1,gf:0,ga:2,gd:-2,pts:0}],
+  groupB: [{team:"Canada",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Bosnia-Herzegovina",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Switzerland",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Qatar",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupC: [{team:"Brazil",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Scotland",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Haiti",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Morocco",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupD: [{team:"Paraguay",mp:1,w:0,d:0,l:1,gf:1,ga:4,gd:-3,pts:0},{team:"Türkiye",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Australia",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"United States",mp:1,w:1,d:0,l:0,gf:4,ga:1,gd:3,pts:3}],
+  groupE: [{team:"Ecuador",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Germany",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Ivory Coast",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Curaçao",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupF: [{team:"Netherlands",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Sweden",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Japan",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Tunisia",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupG: [{team:"Belgium",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Iran",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Egypt",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"New Zealand",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupH: [{team:"Spain",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Uruguay",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Saudi Arabia",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Cape Verde",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupI: [{team:"Norway",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"France",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Senegal",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Iraq",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupJ: [{team:"Argentina",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Austria",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Algeria",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Jordan",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupK: [{team:"Colombia",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Portugal",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Uzbekistan",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Congo DR",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupL: [{team:"England",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Croatia",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Panama",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Ghana",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
 // __GROUP_STANDINGS_END__
 };
 
 var LIVE_STANDINGS = {
 // __LIVE_STANDINGS_START__
-  groupA:[null,null], groupB:[null,null], groupC:[null,null], groupD:[null,null],
-  groupE:[null,null], groupF:[null,null], groupG:[null,null], groupH:[null,null],
-  groupI:[null,null], groupJ:[null,null], groupK:[null,null], groupL:[null,null]
+  groupA: ["Mexico", "Czechia"],
+  groupB: ["Canada", "Bosnia-Herzegovina"],
+  groupC: [null, null],
+  groupD: ["Paraguay", "Türkiye"],
+  groupE: [null, null],
+  groupF: [null, null],
+  groupG: [null, null],
+  groupH: [null, null],
+  groupI: [null, null],
+  groupJ: [null, null],
+  groupK: [null, null],
+  groupL: [null, null],
 // __LIVE_STANDINGS_END__
 };
 
 var ACTUAL_RESULTS = {
 // __ACTUAL_RESULTS_START__
-  groupA:[null,null], groupB:[null,null], groupC:[null,null], groupD:[null,null],
-  groupE:[null,null], groupF:[null,null], groupG:[null,null], groupH:[null,null],
-  groupI:[null,null], groupJ:[null,null], groupK:[null,null], groupL:[null,null],
+  groupA: [null, null],
+  groupB: [null, null],
+  groupC: [null, null],
+  groupD: [null, null],
+  groupE: [null, null],
+  groupF: [null, null],
+  groupG: [null, null],
+  groupH: [null, null],
+  groupI: [null, null],
+  groupJ: [null, null],
+  groupK: [null, null],
+  groupL: [null, null],
 // __ACTUAL_RESULTS_END__
   roundOf32:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null,m17:null,m18:null,m19:null,m20:null,m21:null,m22:null,m23:null,m24:null,m25:null,m26:null,m27:null,m28:null,m29:null,m30:null,m31:null,m32:null},
   roundOf16:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null},
