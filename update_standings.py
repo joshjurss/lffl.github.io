@@ -69,9 +69,10 @@ def fetch_standings():
             continue
 
         found += 1
-        group_standings[key] = team_rows
-        teams   = [r["team"] for r in team_rows]
-        mp_vals = [r["mp"]   for r in team_rows]
+        sorted_rows = sorted(team_rows, key=lambda r: (-r["pts"], -r["gd"], -r["gf"]))
+        group_standings[key] = sorted_rows
+        teams   = [r["team"] for r in sorted_rows]
+        mp_vals = [r["mp"]   for r in sorted_rows]
 
         if any(mp > 0 for mp in mp_vals) and len(teams) >= 2:
             live_standings[key] = [teams[0], teams[1]]
