@@ -562,7 +562,7 @@ function initStandings(){
   var grid=document.getElementById('standings-grid');grid.innerHTML='';
   var groupLabels={groupA:'Group A',groupB:'Group B',groupC:'Group C',groupD:'Group D',groupE:'Group E',groupF:'Group F',groupG:'Group G',groupH:'Group H',groupI:'Group I',groupJ:'Group J',groupK:'Group K',groupL:'Group L'};
   Object.keys(groupLabels).forEach(function(g){
-    var rows=GROUP_STANDINGS[g]||[];
+    var rows=(GROUP_STANDINGS[g]||[]).slice().sort(function(a,b){return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf;});
     var card=document.createElement('div');card.className='fm-card';
     var header='<div class="fm-header">'+groupLabels[g]+'</div>';
     if(!rows.length){
