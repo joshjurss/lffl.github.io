@@ -14,7 +14,8 @@ import requests
 from bs4 import BeautifulSoup
 
 URL = "https://worldcupwiki.com/standings/"
-DATA_JS = "data.js"
+DATA_JS   = "data.js"
+INDEX_HTML = "index.html"
 
 GROUP_KEYS = ["groupA","groupB","groupC","groupD","groupE","groupF",
               "groupG","groupH","groupI","groupJ","groupK","groupL"]
@@ -127,19 +128,19 @@ def build_group_standings_js(group_standings):
             lines.append(f'  {key}: [{",".join(team_strs)}],')
     return "\n".join(lines)
 
-def patch_data_js(final_results, live_standings, group_standings):
-    with open(DATA_JS, "r", encoding="utf-8") as f:
+def patch_file(path, final_results, live_standings, group_standings):
+    with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
     new_group_block = build_group_js(final_results)
     pattern = re.compile(r"(  groupA:.*?)(  // Knockout rounds)", re.DOTALL)
     new_content, count = pattern.subn(new_group_block + "\n\n  // Knockout rounds", content)
     if count == 0:
-        print("WARNING: Could not find ACTUAL_RESULTS group block in data.js.")
-        sys.exit(1)
+        print(f"WARNING: Could not find ACTUAL_RESULTS group block in {path}.")
+        return False
 
     live_block = build_group_js(live_standings)
-    live_pattern = re.compile(r"(const LIVE_STANDINGS\s*=\s*\{)[^}]*(};)", re.DOTALL)
+    live_pattern = re.compile(r"((?:const|var) LIVE_STANDINGS\s*=\s*\{)[^}]*(};)", re.DOTALL)
     new_content, _ = live_pattern.subn(r"\g<1>\n" + live_block + r"\n\g<2>", new_content)
 
     gs_block = build_group_standings_js(group_standings)
@@ -153,10 +154,17 @@ def patch_data_js(final_results, live_standings, group_standings):
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     new_content = re.sub(r'var LAST_UPDATED = ".*?";', f'var LAST_UPDATED = "{ts}";', new_content)
 
-    with open(DATA_JS, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(new_content)
 
-    print("data.js updated successfully.")
+    print(f"{path} updated successfully.")
+    return True
+
+def patch_data_js(final_results, live_standings, group_standings):
+    ok = patch_file(DATA_JS, final_results, live_standings, group_standings)
+    if not ok:
+        sys.exit(1)
+    patch_file(INDEX_HTML, final_results, live_standings, group_standings)
     for key in GROUP_KEYS:
         print(f"  {key}: final={final_results[key]}  live={live_standings[key]}  rows={len(group_standings[key])}")
 
