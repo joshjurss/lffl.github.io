@@ -550,3 +550,27 @@ BRACKET_PICKS.jamie = {
   semiFinal:    { m1:null,m2:null },
   champion:     "Ecuador",
 };
+
+// ── LATE ADDITIONS ────────────────────────────────────────────
+PARTICIPANTS.push({ id: "dad", name: "Dad" });
+BRACKET_PICKS.dad = {
+  groupStage: {
+    groupA: ["Mexico", "South Korea", "Czech Republic"],
+    groupB: ["Switzerland", "Qatar", "Canada"],
+    groupC: ["Brazil", "Morocco", "Scotland"],
+    groupD: ["United States", "Australia", "Turkey"],
+    groupE: ["Germany", "Ecuador"],
+    groupF: ["Netherlands", "Japan", "Tunisia"],
+    groupG: ["Belgium", "Iran", "Egypt"],
+    groupH: ["Spain", "Uruguay"],
+    groupI: ["France", "Senegal", "Norway"],
+    groupJ: ["Argentina", "Austria", "Algeria"],
+    groupK: ["Portugal", "Colombia"],
+    groupL: ["England", "Croatia"],
+  },
+  roundOf32:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null },
+  roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
+  quarterFinal: { m1:null,m2:null,m3:null,m4:null },
+  semiFinal:    { m1:null,m2:null },
+  champion:     "Mexico",
+};
