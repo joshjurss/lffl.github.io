@@ -18,10 +18,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install fotmob-api
+        run: pip install requests beautifulsoup4
 
       - name: Fetch standings and update data.js
         run: python update_standings.py

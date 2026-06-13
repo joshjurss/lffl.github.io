@@ -1,81 +1,79 @@
 #!/usr/bin/env python3
 """
 update_standings.py
-Fetches live 2026 World Cup group standings from Fotmob (league ID 77)
-using the fotmob-api wrapper and patches ACTUAL_RESULTS, LIVE_STANDINGS,
-and GROUP_STANDINGS in data.js.
+Fetches live 2026 World Cup group standings from worldcupwiki.com
+and patches ACTUAL_RESULTS, LIVE_STANDINGS, and GROUP_STANDINGS in data.js.
 
 Run by GitHub Actions every hour.
-Requires: pip install fotmob-api
+Requires: pip install requests beautifulsoup4
 """
 
 import re
 import sys
+import requests
+from bs4 import BeautifulSoup
 
-LEAGUE_ID = 77
+URL = "https://worldcupwiki.com/standings/"
 DATA_JS = "data.js"
 
 GROUP_KEYS = ["groupA","groupB","groupC","groupD","groupE","groupF",
               "groupG","groupH","groupI","groupJ","groupK","groupL"]
 
-SKIP = {"mp","p","pts","pts.","points","gp","played","team","name","club","#","pos",""}
+SKIP = {"mp","p","pts","pts.","points","gp","played","team","name",
+        "club","#","pos","gf","ga","gd","w","d","l",""}
+
+def safe_int(v):
+    try: return int(v)
+    except: return 0
 
 # ── Fetch & parse ────────────────────────────────────────────────────────────
 
-def parse_scores(scores_str):
-    try:
-        parts = str(scores_str).split("-")
-        return int(parts[0]), int(parts[1])
-    except Exception:
-        return 0, 0
-
 def fetch_standings():
-    from fotmob_api import FotmobAPI
-    client = FotmobAPI()
-    raw = client.get_league_table(league_id=LEAGUE_ID)
+    resp = requests.get(URL, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
+    resp.raise_for_status()
+    soup = BeautifulSoup(resp.text, "html.parser")
 
     final_results   = {k: [None, None] for k in GROUP_KEYS}
     live_standings  = {k: [None, None] for k in GROUP_KEYS}
     group_standings = {k: [] for k in GROUP_KEYS}
 
-    if not isinstance(raw, list):
-        raw = [raw]
-
+    headers = soup.find_all(["h2", "h3"])
     found = 0
-    for section in raw:
-        section_data = section.get("data", section)
-        league_name  = section_data.get("leagueName", section_data.get("name", ""))
-
-        m = re.search(r"Group\s+([A-L])\b", league_name, re.IGNORECASE)
+    for hdr in headers:
+        m = re.search(r"Group\s+([A-L])\b", hdr.get_text(), re.IGNORECASE)
         if not m:
             continue
-
         key = "group" + m.group(1).upper()
 
-        table_obj = section_data.get("table", {})
-        rows_raw  = (table_obj.get("all") or table_obj.get("overall")
-                     or table_obj.get("home") or section_data.get("rows") or [])
+        table = hdr.find_next("table")
+        if not table:
+            continue
 
         team_rows = []
-        for entry in rows_raw:
-            name = str(entry.get("name", entry.get("teamName", ""))).strip()
+        for row in table.find_all("tr"):
+            cells = [td.get_text(strip=True) for td in row.find_all(["td", "th"])]
+            if not cells:
+                continue
+
+            # Name is first non-header cell (skip rank col if present)
+            name = ""
+            for c in cells:
+                if c.lower() not in SKIP and not c.isdigit():
+                    name = c
+                    break
             if not name or name.lower() in SKIP:
                 continue
 
-            mp = entry.get("played", entry.get("mp", 0))
-            w  = entry.get("wins",   entry.get("w",  0))
-            d  = entry.get("draws",  entry.get("d",  0))
-            l  = entry.get("losses", entry.get("l",  0))
-
-            gf, ga = 0, 0
-            if "scoresStr" in entry:
-                gf, ga = parse_scores(entry["scoresStr"])
+            # worldcupwiki layout: Pos | Team | MP | W | D | L | GF | GA | GD | Pts
+            if len(cells) >= 10:
+                mp, w, d, l = safe_int(cells[2]), safe_int(cells[3]), safe_int(cells[4]), safe_int(cells[5])
+                gf, ga, gd, pts = safe_int(cells[6]), safe_int(cells[7]), safe_int(cells[8]), safe_int(cells[9])
+            elif len(cells) >= 9:
+                mp, w, d, l = safe_int(cells[1]), safe_int(cells[2]), safe_int(cells[3]), safe_int(cells[4])
+                gf, ga, gd, pts = safe_int(cells[5]), safe_int(cells[6]), safe_int(cells[7]), safe_int(cells[8])
             else:
-                gf = entry.get("gf", entry.get("goalsFor",     0))
-                ga = entry.get("ga", entry.get("goalsAgainst", 0))
-
-            gd  = gf - ga
-            pts = entry.get("pts", entry.get("points", w * 3 + d))
+                mp = w = d = l = gf = ga = gd = 0
+                pts = safe_int(cells[-1])
 
             team_rows.append(dict(team=name, mp=mp, w=w, d=d, l=l,
                                   gf=gf, ga=ga, gd=gd, pts=pts))
@@ -96,7 +94,7 @@ def fetch_standings():
 
     print(f"Found standings for {found}/12 groups.")
     if found == 0:
-        print("WARNING: No group data found. Raw sample:", str(raw[0])[:300] if raw else "empty")
+        print("WARNING: No group data found. Check page structure at", URL)
 
     return final_results, live_standings, group_standings
 
@@ -166,7 +164,7 @@ def patch_data_js(final_results, live_standings, group_standings):
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print(f"Fetching standings from Fotmob (league ID {LEAGUE_ID})...")
+    print(f"Fetching standings from {URL} ...")
     try:
         final_results, live_standings, group_standings = fetch_standings()
     except Exception as e:
