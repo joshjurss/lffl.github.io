@@ -519,21 +519,28 @@ function renderWCRound(){
   }
 }
 
-var FLAG={
-  'mexico':'🇲🇽','south korea':'🇰🇷','south africa':'🇿🇦','czechia':'🇨🇿','czech republic':'🇨🇿',
-  'canada':'🇨🇦','bosnia and herzegovina':'🇧🇦','qatar':'🇶🇦','switzerland':'🇨🇭',
-  'brazil':'🇧🇷','morocco':'🇲🇦','haiti':'🇭🇹','scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-  'united states':'🇺🇸','usa':'🇺🇸','australia':'🇦🇺','paraguay':'🇵🇾','turkey':'🇹🇷',
-  'germany':'🇩🇪','ecuador':'🇪🇨','ivory coast':'🇨🇮','côte d\'ivoire':'🇨🇮','curacao':'🇨🇼',
-  'netherlands':'🇳🇱','japan':'🇯🇵','tunisia':'🇹🇳','sweden':'🇸🇪',
-  'belgium':'🇧🇪','iran':'🇮🇷','egypt':'🇪🇬','new zealand':'🇳🇿',
-  'spain':'🇪🇸','uruguay':'🇺🇾','saudi arabia':'🇸🇦','cape verde':'🇨🇻',
-  'france':'🇫🇷','senegal':'🇸🇳','norway':'🇳🇴','iraq':'🇮🇶',
-  'argentina':'🇦🇷','austria':'🇦🇹','algeria':'🇩🇿','jordan':'🇯🇴',
-  'portugal':'🇵🇹','colombia':'🇨🇴','uzbekistan':'🇺🇿','dr congo':'🇨🇩',
-  'england':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','croatia':'🇭🇷','panama':'🇵🇦','ghana':'🇬🇭'
+var FLAG_CODE={
+  'mexico':'mx','south korea':'kr','south africa':'za','czechia':'cz','czech republic':'cz',
+  'canada':'ca','bosnia and herzegovina':'ba','bosnia-herzegovina':'ba','qatar':'qa','switzerland':'ch',
+  'brazil':'br','morocco':'ma','haiti':'ht','scotland':'gb-sct',
+  'united states':'us','usa':'us','australia':'au','paraguay':'py','turkey':'tr','türkiye':'tr',
+  'germany':'de','ecuador':'ec','ivory coast':'ci','côte d\'ivoire':'ci','curacao':'cw',
+  'netherlands':'nl','japan':'jp','tunisia':'tn','sweden':'se',
+  'belgium':'be','iran':'ir','egypt':'eg','new zealand':'nz',
+  'spain':'es','uruguay':'uy','saudi arabia':'sa','cape verde':'cv',
+  'france':'fr','senegal':'sn','norway':'no','iraq':'iq',
+  'argentina':'ar','austria':'at','algeria':'dz','jordan':'jo',
+  'portugal':'pt','colombia':'co','uzbekistan':'uz','dr congo':'cd','congo dr':'cd',
+  'england':'gb-eng','croatia':'hr','panama':'pa','ghana':'gh',
+  'iran':'ir','new zealand':'nz','iraq':'iq','jordan':'jo','cape verde':'cv',
 };
-function getFlag(name){return FLAG[name.toLowerCase()]||'🏳️';}
+function getFlag(name,size){
+  if(!name)return'';
+  var code=FLAG_CODE[name.toLowerCase()];
+  if(!code)return'';
+  var px=size||20;
+  return'<img src="https://flagcdn.com/'+px+'x'+Math.round(px*.75)+'/'+code+'.png" style="width:'+px+'px;height:'+Math.round(px*.75)+'px;border-radius:2px;vertical-align:middle;display:inline-block" alt="'+name+'">';
+}
 
 function initStandings(){
   var upd=(LAST_UPDATED!=='never')?' · updated '+LAST_UPDATED:'';
