@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "never"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-06-13 03:56 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
@@ -80,17 +80,17 @@ const LIVE_STANDINGS = {
 // {team, mp, w, d, l, gf, ga, gd, pts}
 const GROUP_STANDINGS = {
 // __GROUP_STANDINGS_START__
-  groupA: [],
-  groupB: [],
-  groupC: [],
-  groupD: [],
-  groupE: [],
-  groupF: [],
-  groupG: [],
-  groupH: [],
-  groupI: [],
-  groupJ: [],
-  groupK: [],
+  groupA: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupB: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupC: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupD: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupE: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupF: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupG: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupH: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupI: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupJ: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupK: [{team:"MP",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
   groupL: [],
 // __GROUP_STANDINGS_END__
 };
