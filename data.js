@@ -36,6 +36,7 @@ const SCORING = {
 // A group is only scored once BOTH slots are filled.
 // Last updated: June 12, 2026 — 2 matches played (Group A matchday 1)
 const ACTUAL_RESULTS = {
+// __ACTUAL_RESULTS_START__
   groupA: [null, null],
   groupB: [null, null],
   groupC: [null, null],
@@ -48,6 +49,7 @@ const ACTUAL_RESULTS = {
   groupJ: [null, null],
   groupK: [null, null],
   groupL: [null, null],
+// __ACTUAL_RESULTS_END__
 
   // Knockout rounds — fill in winner of each match slot
   roundOf32:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null },
@@ -61,6 +63,7 @@ const ACTUAL_RESULTS = {
 // Current top 2 per group based on live standings (updated hourly).
 // Used to color group stage picks green/red during the group stage.
 const LIVE_STANDINGS = {
+// __LIVE_STANDINGS_START__
   groupA: ["Mexico", "Czechia"],
   groupB: ["Canada", "Bosnia-Herzegovina"],
   groupC: [null, null],
@@ -73,6 +76,7 @@ const LIVE_STANDINGS = {
   groupJ: [null, null],
   groupK: [null, null],
   groupL: [null, null],
+// __LIVE_STANDINGS_END__
 };
 
 // ── GROUP STANDINGS ───────────────────────────────────────────

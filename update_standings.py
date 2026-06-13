@@ -115,41 +115,47 @@ def build_group_standings_js(group_standings):
             lines.append(f'  {key}: [{",".join(team_strs)}],')
     return "\n".join(lines)
 
+def replace_between_markers(content, start_marker, end_marker, new_block, path):
+    pattern = re.compile(
+        r"(" + re.escape(start_marker) + r"\n).*?(" + re.escape(end_marker) + r")",
+        re.DOTALL
+    )
+    new_content, n = pattern.subn(r"\g<1>" + new_block + r"\n\g<2>", content)
+    if n == 0:
+        print(f"  SKIP: markers {start_marker!r} not found in {path}")
+    return new_content
+
 def patch_file(path, final_results, live_standings, group_standings, ts):
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # ACTUAL_RESULTS group rows
-    new_group_block = build_group_js(final_results)
-    pattern = re.compile(r"(  groupA:.*?)(  // Knockout rounds)", re.DOTALL)
-    new_content, count = pattern.subn(new_group_block + "\n\n  // Knockout rounds", content)
-    if count == 0:
-        print(f"  SKIP: no ACTUAL_RESULTS group block found in {path}")
-        new_content = content  # still patch other blocks
-
-    # LIVE_STANDINGS
-    live_block = build_group_js(live_standings)
-    live_pattern = re.compile(r"((?:const|var) LIVE_STANDINGS\s*=\s*\{)[^}]*(};)", re.DOTALL)
-    new_content, n = live_pattern.subn(r"\g<1>\n" + live_block + r"\n\g<2>", new_content)
-    if n == 0:
-        print(f"  SKIP: no LIVE_STANDINGS block found in {path}")
-
-    # GROUP_STANDINGS
-    gs_block = build_group_standings_js(group_standings)
-    gs_pattern = re.compile(
-        r"(// __GROUP_STANDINGS_START__\n).*?(// __GROUP_STANDINGS_END__)",
-        re.DOTALL
+    content = replace_between_markers(
+        content,
+        "// __ACTUAL_RESULTS_START__",
+        "// __ACTUAL_RESULTS_END__",
+        build_group_js(final_results),
+        path
     )
-    new_content, n = gs_pattern.subn(r"\g<1>" + gs_block + r"\n\g<2>", new_content)
-    if n == 0:
-        print(f"  SKIP: no GROUP_STANDINGS markers found in {path}")
+    content = replace_between_markers(
+        content,
+        "// __LIVE_STANDINGS_START__",
+        "// __LIVE_STANDINGS_END__",
+        build_group_js(live_standings),
+        path
+    )
+    content = replace_between_markers(
+        content,
+        "// __GROUP_STANDINGS_START__",
+        "// __GROUP_STANDINGS_END__",
+        build_group_standings_js(group_standings),
+        path
+    )
 
-    # LAST_UPDATED
-    new_content = re.sub(r'var LAST_UPDATED = ".*?";',
-                         f'var LAST_UPDATED = "{ts}";', new_content)
+    content = re.sub(r'var LAST_UPDATED = ".*?";',
+                     f'var LAST_UPDATED = "{ts}";', content)
 
     with open(path, "w", encoding="utf-8") as f:
-        f.write(new_content)
+        f.write(content)
     print(f"  {path} patched.")
 
 def patch_all(final_results, live_standings, group_standings):
