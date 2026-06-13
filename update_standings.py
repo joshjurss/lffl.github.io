@@ -5,7 +5,7 @@ Fetches live 2026 World Cup group standings from Fotmob (league ID 77)
 using the fotmob-api wrapper and patches ACTUAL_RESULTS, LIVE_STANDINGS,
 and GROUP_STANDINGS in data.js.
 
-Run by GitHub Actions every hour. Safe to run manually too.
+Run by GitHub Actions every hour.
 Requires: pip install fotmob-api
 """
 
@@ -18,10 +18,11 @@ DATA_JS = "data.js"
 GROUP_KEYS = ["groupA","groupB","groupC","groupD","groupE","groupF",
               "groupG","groupH","groupI","groupJ","groupK","groupL"]
 
+SKIP = {"mp","p","pts","pts.","points","gp","played","team","name","club","#","pos",""}
+
 # ── Fetch & parse ────────────────────────────────────────────────────────────
 
 def parse_scores(scores_str):
-    """Parse '3-1' into (3, 1). Returns (0, 0) on failure."""
     try:
         parts = str(scores_str).split("-")
         return int(parts[0]), int(parts[1])
@@ -29,13 +30,7 @@ def parse_scores(scores_str):
         return 0, 0
 
 def fetch_standings():
-    """
-    Returns (final_results, live_standings, group_standings).
-    final_results:   groupX -> [1st, 2nd] only when group fully complete, else [None, None]
-    live_standings:  groupX -> [1st, 2nd] based on current standings (None if no matches played)
-    group_standings: groupX -> list of {team, mp, w, d, l, gf, ga, gd, pts} for all 4 teams
-    """
-    from fotmob import FotmobAPI
+    from fotmob_api import FotmobAPI
     client = FotmobAPI()
     raw = client.get_league_table(league_id=LEAGUE_ID)
 
@@ -43,8 +38,6 @@ def fetch_standings():
     live_standings  = {k: [None, None] for k in GROUP_KEYS}
     group_standings = {k: [] for k in GROUP_KEYS}
 
-    # raw is a list of group table objects
-    # Each entry: {"data": {"leagueName": "Group A", "table": {"all": [...]}}}
     if not isinstance(raw, list):
         raw = [raw]
 
@@ -59,12 +52,10 @@ def fetch_standings():
 
         key = "group" + m.group(1).upper()
 
-        # Try "all" table first, fall back to other keys
         table_obj = section_data.get("table", {})
         rows_raw  = (table_obj.get("all") or table_obj.get("overall")
                      or table_obj.get("home") or section_data.get("rows") or [])
 
-        SKIP = {"mp","p","pts","points","gp","played","team","name","club","#","pos",""}
         team_rows = []
         for entry in rows_raw:
             name = str(entry.get("name", entry.get("teamName", ""))).strip()
@@ -105,7 +96,7 @@ def fetch_standings():
 
     print(f"Found standings for {found}/12 groups.")
     if found == 0:
-        print("WARNING: No group data found. Raw response keys:", list(raw[0].keys()) if raw else "empty")
+        print("WARNING: No group data found. Raw sample:", str(raw[0])[:300] if raw else "empty")
 
     return final_results, live_standings, group_standings
 
@@ -142,7 +133,6 @@ def patch_data_js(final_results, live_standings, group_standings):
     with open(DATA_JS, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # Patch ACTUAL_RESULTS group block
     new_group_block = build_group_js(final_results)
     pattern = re.compile(r"(  groupA:.*?)(  // Knockout rounds)", re.DOTALL)
     new_content, count = pattern.subn(new_group_block + "\n\n  // Knockout rounds", content)
@@ -150,12 +140,10 @@ def patch_data_js(final_results, live_standings, group_standings):
         print("WARNING: Could not find ACTUAL_RESULTS group block in data.js.")
         sys.exit(1)
 
-    # Patch LIVE_STANDINGS block
     live_block = build_group_js(live_standings)
     live_pattern = re.compile(r"(const LIVE_STANDINGS\s*=\s*\{)[^}]*(};)", re.DOTALL)
     new_content, _ = live_pattern.subn(r"\g<1>\n" + live_block + r"\n\g<2>", new_content)
 
-    # Patch GROUP_STANDINGS block using marker comments
     gs_block = build_group_standings_js(group_standings)
     gs_pattern = re.compile(
         r"(// __GROUP_STANDINGS_START__\n).*?(// __GROUP_STANDINGS_END__)",
@@ -163,7 +151,6 @@ def patch_data_js(final_results, live_standings, group_standings):
     )
     new_content, _ = gs_pattern.subn(r"\g<1>" + gs_block + r"\n\g<2>", new_content)
 
-    # Update LAST_UPDATED timestamp
     from datetime import datetime, timezone
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     new_content = re.sub(r'var LAST_UPDATED = ".*?";', f'var LAST_UPDATED = "{ts}";', new_content)
