@@ -100,7 +100,52 @@
     .champ-card .trophy{font-size:1.6rem;}
     .champ-card .clbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:4px;}
     .champ-card .cteam{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.04em;margin-top:2px;}
-    @media(max-width:600px){.lb-row{grid-template-columns:44px 1fr 80px 100px;}.col-correct{display:none;}}
+    .round-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;background:var(--white);border-radius:10px;padding:10px 16px;border:1px solid var(--border);}
+    .round-arrow{background:none;border:1px solid var(--border);border-radius:6px;padding:7px 16px;cursor:pointer;font-size:1rem;color:var(--navy);transition:background .12s,color .12s;}
+    .round-arrow:hover:not(:disabled){background:var(--navy);color:var(--white);}
+    .round-arrow:disabled{opacity:.3;cursor:default;}
+    .round-title-text{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.06em;color:var(--navy);}
+    .round-dot-row{display:flex;gap:5px;align-items:center;justify-content:center;margin-top:4px;}
+    .round-dot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:background .15s;}
+    .round-dot.active{background:var(--navy);}
+    .round-picks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:1.5rem;}
+    .pick-item{background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;display:flex;align-items:center;gap:6px;font-size:.84rem;font-weight:500;}
+    .pick-item.winner{border-color:#52B788;background:#EDF7F1;color:var(--correct);}
+    .pick-item.loser{border-color:#FECACA;background:#FEF2F2;color:#991B1B;}
+    .pick-item.empty{color:#C5CBD3;border-style:dashed;font-style:italic;}
+    .pick-pts{font-size:.7rem;font-weight:700;color:var(--correct);margin-left:auto;}
+    .champ-solo{display:flex;justify-content:center;padding:2rem 0;}
+    .champ-solo .champ-card{max-width:200px;}
+    @media(max-width:600px){
+      .lb-row{grid-template-columns:44px 1fr 72px 90px;}
+      .col-correct{display:none;}
+      .standings-grid{grid-template-columns:1fr;}
+      .view{padding:1.5rem 1rem;}
+      h1{font-size:1.9rem;}
+    }
+    @media(max-width:480px){
+      header{height:auto;padding:.5rem 1rem;flex-wrap:wrap;gap:4px;}
+      .logo{font-size:1.3rem;width:100%;}
+      nav{width:100%;justify-content:center;}
+      nav button{font-size:.78rem;padding:7px 10px;}
+      .lb-row{grid-template-columns:36px 1fr 60px 80px;padding:0 .75rem;height:52px;}
+      .lb-row.header-row{height:34px;font-size:.65rem;}
+      .player-name{font-size:.82rem;gap:7px;}
+      .avatar{width:26px;height:26px;font-size:.62rem;}
+      .pts-cell .big{font-size:1.1rem;}
+      .champ-pick{display:none;}
+      .view-btn{font-size:.7rem;padding:4px 8px;}
+      /* Hide W/D/L/GF/GA in standings table — keep P, GD, Pts */
+      .fm-table th:nth-child(5),.fm-table td:nth-child(5),
+      .fm-table th:nth-child(6),.fm-table td:nth-child(6),
+      .fm-table th:nth-child(7),.fm-table td:nth-child(7),
+      .fm-table th:nth-child(8),.fm-table td:nth-child(8),
+      .fm-table th:nth-child(9),.fm-table td:nth-child(9){display:none;}
+      .groups-grid{grid-template-columns:repeat(2,1fr);}
+      .score-summary{grid-template-columns:repeat(2,1fr);}
+      .person-chip{padding:5px 12px;font-size:.78rem;}
+      .section-label{font-size:.9rem;}
+    }
   </style>
 </head>
 <body>
@@ -268,6 +313,9 @@ BRACKET_PICKS.larry={groupStage:{groupA:["Mexico","Czech Republic","South Korea"
 PARTICIPANTS.push({id:"joshz",name:"Josh Z"});
 BRACKET_PICKS.joshz={groupStage:{groupA:["Mexico","Czech Republic","South Korea"],groupB:["Switzerland","Canada","Qatar"],groupC:["Brazil","Morocco","Scotland"],groupD:["United States","Turkey"],groupE:["Germany","Ecuador","Ivory Coast"],groupF:["Netherlands","Tunisia","Sweden"],groupG:["Belgium","Iran","Egypt"],groupH:["Spain","Uruguay"],groupI:["France","Senegal","Norway"],groupJ:["Argentina","Austria","Algeria"],groupK:["Portugal","Colombia"],groupL:["England","Croatia"]},roundOf32:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null,m17:null,m18:null,m19:null,m20:null,m21:null,m22:null,m23:null,m24:null,m25:null,m26:null,m27:null,m28:null,m29:null,m30:null,m31:null,m32:null},roundOf16:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null},quarterFinal:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null},semiFinal:{m1:null,m2:null,m3:null,m4:null},final:{m1:null,m2:null},champion:null};
 
+PARTICIPANTS.push({id:"jamie",name:"Jamie"});
+BRACKET_PICKS.jamie={groupStage:{groupA:["Mexico","South Korea","Czech Republic"],groupB:["Switzerland","Qatar","Canada"],groupC:["Brazil","Morocco","Scotland"],groupD:["United States","Australia","Turkey"],groupE:["Germany","Ecuador"],groupF:["Netherlands","Japan","Tunisia"],groupG:["Belgium","Iran","Egypt"],groupH:["Spain","Uruguay"],groupI:["France","Senegal","Norway"],groupJ:["Argentina","Austria","Algeria"],groupK:["Portugal","Colombia"],groupL:["England","Croatia"]},roundOf32:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null,m17:null,m18:null,m19:null,m20:null,m21:null,m22:null,m23:null,m24:null,m25:null,m26:null,m27:null,m28:null,m29:null,m30:null,m31:null,m32:null},roundOf16:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null},quarterFinal:{m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null},semiFinal:{m1:null,m2:null,m3:null,m4:null},final:{m1:null,m2:null},champion:null};
+
 // ══════════════════════════════════════════════════════════════
 //  SCORING ENGINE
 // ══════════════════════════════════════════════════════════════
@@ -416,78 +464,69 @@ function renderBracket(personId){
   });
   html+='</div>';
   html+='<div class="section-label" style="margin-bottom:1.5rem">Knockout Bracket</div>';
-  html+=buildBracketHTML(picks);
+  html+=buildBracketHTML();
   body.innerHTML=html;
-  setTimeout(drawLines,50);
+  renderKnockoutRound(picks);
 }
 
-function buildBracketHTML(picks){
-  var rounds=[
-    {key:'roundOf32',label:'Round of 32',n:32,pts:SCORING.roundOf32},
-    {key:'roundOf16',label:'Round of 16',n:16,pts:SCORING.roundOf16},
-    {key:'quarterFinal',label:'Quarters',n:8,pts:SCORING.quarterFinal},
-    {key:'semiFinal',label:'Semis',n:4,pts:SCORING.semiFinal},
-    {key:'final',label:'Final',n:2,pts:SCORING.final}
-  ];
-  var html='<div class="bracket-scroll"><div class="bracket-tree" id="btree">';
-  rounds.forEach(function(round){
-    html+='<div class="b-round"><div class="b-round-label">'+round.label+'</div><div class="b-slots">';
+var KNOCKOUT_ROUNDS=[
+  {key:'roundOf32',label:'Round of 32',n:32,pts:SCORING.roundOf32},
+  {key:'roundOf16',label:'Round of 16',n:16,pts:SCORING.roundOf16},
+  {key:'quarterFinal',label:'Quarters',n:8,pts:SCORING.quarterFinal},
+  {key:'semiFinal',label:'Semis',n:4,pts:SCORING.semiFinal},
+  {key:'final',label:'Final',n:2,pts:SCORING.final},
+  {key:'champion',label:'Champion',n:1,pts:SCORING.champion}
+];
+var currentKnockoutRound=0;
+
+function buildBracketHTML(){
+  currentKnockoutRound=0;
+  var dots=KNOCKOUT_ROUNDS.map(function(_,i){return'<div class="round-dot'+(i===0?' active':'')+'" id="rdot-'+i+'"></div>';}).join('');
+  return'<div class="round-nav">'+
+    '<button class="round-arrow" id="round-prev" onclick="navRound(-1)" disabled>&#8592;</button>'+
+    '<div style="text-align:center"><div class="round-title-text" id="round-title-label">Round of 32</div>'+
+    '<div class="round-dot-row">'+dots+'</div></div>'+
+    '<button class="round-arrow" id="round-next" onclick="navRound(1)">&#8594;</button>'+
+    '</div><div id="round-picks"></div>';
+}
+
+function navRound(dir){
+  currentKnockoutRound=Math.max(0,Math.min(KNOCKOUT_ROUNDS.length-1,currentKnockoutRound+dir));
+  renderKnockoutRound(BRACKET_PICKS[currentPerson]);
+}
+
+function renderKnockoutRound(picks){
+  var round=KNOCKOUT_ROUNDS[currentKnockoutRound];
+  var label=document.getElementById('round-title-label');
+  var container=document.getElementById('round-picks');
+  var prevBtn=document.getElementById('round-prev');
+  var nextBtn=document.getElementById('round-next');
+  if(!container)return;
+  if(label)label.textContent=round.label;
+  if(prevBtn)prevBtn.disabled=currentKnockoutRound===0;
+  if(nextBtn)nextBtn.disabled=currentKnockoutRound===KNOCKOUT_ROUNDS.length-1;
+  KNOCKOUT_ROUNDS.forEach(function(_,i){var d=document.getElementById('rdot-'+i);if(d)d.className='round-dot'+(i===currentKnockoutRound?' active':'');});
+  if(round.key==='champion'){
+    var cp=picks.champion||null,ca=ACTUAL_RESULTS.champion||null;
+    var cw=ca&&cp&&normalize(cp)===normalize(ca);
+    var cpts=cw?'<div style="font-size:.65rem;color:var(--correct);font-weight:700;margin-top:6px">+'+SCORING.champion+' pts</div>':(ca?'<div style="font-size:.65rem;color:var(--wrong);margin-top:6px">'+ca+' won</div>':'');
+    container.innerHTML='<div class="champ-solo"><div class="champ-card'+(cw?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">Champion Pick</div><div class="cteam">'+(cp||'—')+'</div>'+cpts+'</div></div>';
+  }else{
     var roundActuals=Object.values(ACTUAL_RESULTS[round.key]||{}).filter(Boolean);
     var hasResults=roundActuals.length>0;
+    var html='<div class="round-picks-grid">';
     for(var i=1;i<=round.n;i++){
       var pick=(picks[round.key]&&picks[round.key]['m'+i])||null;
       var correct=pick&&hasResults&&roundActuals.some(function(a){return normalize(pick)===normalize(a);});
       var cls=!pick?'empty':(!hasResults?'':(correct?'winner':'loser'));
-      var pts=(correct&&round.pts)?'<span class="b-pts">+'+round.pts+'</span>':'';
-      html+='<div class="b-match-group"><div class="b-team '+cls+'">'+(pick||'—')+pts+'</div></div>';
+      var pts=correct&&round.pts?'<span class="pick-pts">+'+round.pts+'</span>':'';
+      html+='<div class="pick-item '+cls+'">'+(pick?getFlag(pick)+' '+pick:'—')+pts+'</div>';
     }
-    html+='</div></div>';
-  });
-  var cp=picks.champion||null,ca=ACTUAL_RESULTS.champion||null;
-  var cw=ca&&cp&&normalize(cp)===normalize(ca);
-  var cpts=cw?'<div style="font-size:.65rem;color:var(--correct);font-weight:700;margin-top:4px">+'+SCORING.champion+'pts</div>':(ca?'<div style="font-size:.65rem;color:var(--wrong);margin-top:4px">'+ca+' won</div>':'');
-  html+='<div class="b-champ-col"><div class="b-round-label" style="text-align:center">Champion</div><div class="b-champ-box">'+
-    '<div class="champ-card'+(cw?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">Champion</div>'+
-    '<div class="cteam">'+(cp||'—')+'</div>'+cpts+'</div></div></div>';
-  html+='<svg class="b-svg" id="bsvg" xmlns="http://www.w3.org/2000/svg"></svg>';
-  html+='</div></div>';
-  return html;
+    html+='</div>';
+    container.innerHTML=html;
+  }
 }
 
-function drawLines(){
-  var tree=document.getElementById('btree'),svg=document.getElementById('bsvg');
-  if(!tree||!svg)return;svg.innerHTML='';
-  var tr=tree.getBoundingClientRect(),rounds=tree.querySelectorAll('.b-slots');
-  for(var ri=0;ri<rounds.length-1;ri++){
-    var cur=rounds[ri].querySelectorAll('.b-match-group'),nxt=rounds[ri+1].querySelectorAll('.b-match-group');
-    for(var ni=0;ni<nxt.length;ni++){
-      var a=cur[ni*2],b=cur[ni*2+1],c=nxt[ni];if(!a||!b||!c)continue;
-      var aR=a.querySelector('.b-team').getBoundingClientRect();
-      var bR=b.querySelector('.b-team').getBoundingClientRect();
-      var cR=c.querySelector('.b-team').getBoundingClientRect();
-      var x1=aR.right-tr.left,y1=aR.top+aR.height/2-tr.top;
-      var y2=bR.top+bR.height/2-tr.top,xM=(aR.right+cR.left)/2-tr.left;
-      var x3=cR.left-tr.left,y3=cR.top+cR.height/2-tr.top;
-      var path=document.createElementNS('http://www.w3.org/2000/svg','path');
-      path.setAttribute('d','M'+x1+','+y1+' H'+xM+' V'+y2+' H'+x1+' M'+xM+','+((y1+y2)/2)+' H'+x3);
-      path.setAttribute('fill','none');path.setAttribute('stroke','#C5D0DC');path.setAttribute('stroke-width','1.5');
-      svg.appendChild(path);
-    }
-  }
-  var ls=rounds[rounds.length-1].querySelectorAll('.b-match-group'),cb=document.querySelector('.b-champ-box .champ-card');
-  if(ls.length>=2&&cb){
-    var s1=ls[0].querySelector('.b-team').getBoundingClientRect();
-    var s2=ls[1].querySelector('.b-team').getBoundingClientRect();
-    var cB=cb.getBoundingClientRect();
-    var lx=s1.right-tr.left,ly1=s1.top+s1.height/2-tr.top,ly2=s2.top+s2.height/2-tr.top;
-    var lxM=(s1.right+cB.left)/2-tr.left,lx3=cB.left-tr.left,ly3=cB.top+cB.height/2-tr.top;
-    var p2=document.createElementNS('http://www.w3.org/2000/svg','path');
-    p2.setAttribute('d','M'+lx+','+ly1+' H'+lxM+' V'+ly2+' H'+lx+' M'+lxM+','+((ly1+ly2)/2)+' H'+lx3);
-    p2.setAttribute('fill','none');p2.setAttribute('stroke','#C5D0DC');p2.setAttribute('stroke-width','1.5');
-    svg.appendChild(p2);
-  }
-}
-window.addEventListener('resize',function(){if(document.getElementById('brackets').classList.contains('active'))drawLines();});
 
 function initBrackets(){
   var tabs=document.getElementById('person-tabs');tabs.innerHTML='';
@@ -504,64 +543,55 @@ function initBrackets(){
   renderBracket(currentPerson);
 }
 
+var WC_ROUNDS=[
+  {key:'roundOf32',label:'Round of 32',n:32},
+  {key:'roundOf16',label:'Round of 16',n:16},
+  {key:'quarterFinal',label:'Quarters',n:8},
+  {key:'semiFinal',label:'Semis',n:4},
+  {key:'final',label:'Final',n:2},
+  {key:'champion',label:'Champion',n:1}
+];
+var currentWCRound=0;
+
 function buildWCBracketHTML(){
-  var rounds=[
-    {key:'roundOf32',label:'Round of 32',n:32},
-    {key:'roundOf16',label:'Round of 16',n:16},
-    {key:'quarterFinal',label:'Quarters',n:8},
-    {key:'semiFinal',label:'Semis',n:4},
-    {key:'final',label:'Final',n:2}
-  ];
-  var html='<div class="bracket-scroll"><div class="bracket-tree" id="wc-btree">';
-  rounds.forEach(function(round){
-    html+='<div class="b-round"><div class="b-round-label">'+round.label+'</div><div class="b-slots">';
-    for(var i=1;i<=round.n;i++){
-      var team=(ACTUAL_RESULTS[round.key]&&ACTUAL_RESULTS[round.key]['m'+i])||null;
-      var cls=team?'':'empty';
-      html+='<div class="b-match-group"><div class="b-team '+cls+'">'+(team||'TBD')+'</div></div>';
-    }
-    html+='</div></div>';
-  });
-  var champ=ACTUAL_RESULTS.champion||null;
-  html+='<div class="b-champ-col"><div class="b-round-label" style="text-align:center">Champion</div><div class="b-champ-box">'+
-    '<div class="champ-card'+(champ?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">Champion</div>'+
-    '<div class="cteam">'+(champ||'TBD')+'</div></div></div></div>';
-  html+='<svg class="b-svg" id="wc-bsvg" xmlns="http://www.w3.org/2000/svg"></svg>';
-  html+='</div></div>';
-  return html;
+  currentWCRound=0;
+  var dots=WC_ROUNDS.map(function(_,i){return'<div class="round-dot'+(i===0?' active':'')+'" id="wcdot-'+i+'"></div>';}).join('');
+  return'<div class="round-nav">'+
+    '<button class="round-arrow" id="wc-round-prev" onclick="navWCRound(-1)" disabled>&#8592;</button>'+
+    '<div style="text-align:center"><div class="round-title-text" id="wc-round-title">Round of 32</div>'+
+    '<div class="round-dot-row">'+dots+'</div></div>'+
+    '<button class="round-arrow" id="wc-round-next" onclick="navWCRound(1)">&#8594;</button>'+
+    '</div><div id="wc-round-picks"></div>';
 }
 
-function drawWCLines(){
-  var tree=document.getElementById('wc-btree'),svg=document.getElementById('wc-bsvg');
-  if(!tree||!svg)return;svg.innerHTML='';
-  var tr=tree.getBoundingClientRect(),rounds=tree.querySelectorAll('.b-slots');
-  for(var ri=0;ri<rounds.length-1;ri++){
-    var cur=rounds[ri].querySelectorAll('.b-match-group'),nxt=rounds[ri+1].querySelectorAll('.b-match-group');
-    for(var ni=0;ni<nxt.length;ni++){
-      var a=cur[ni*2],b=cur[ni*2+1],c=nxt[ni];if(!a||!b||!c)continue;
-      var aR=a.querySelector('.b-team').getBoundingClientRect();
-      var bR=b.querySelector('.b-team').getBoundingClientRect();
-      var cR=c.querySelector('.b-team').getBoundingClientRect();
-      var x1=aR.right-tr.left,y1=aR.top+aR.height/2-tr.top;
-      var y2=bR.top+bR.height/2-tr.top,xM=(aR.right+cR.left)/2-tr.left;
-      var x3=cR.left-tr.left;
-      var path=document.createElementNS('http://www.w3.org/2000/svg','path');
-      path.setAttribute('d','M'+x1+','+y1+' H'+xM+' V'+y2+' H'+x1+' M'+xM+','+((y1+y2)/2)+' H'+x3);
-      path.setAttribute('fill','none');path.setAttribute('stroke','#C5D0DC');path.setAttribute('stroke-width','1.5');
-      svg.appendChild(path);
+function navWCRound(dir){
+  currentWCRound=Math.max(0,Math.min(WC_ROUNDS.length-1,currentWCRound+dir));
+  renderWCRound();
+}
+
+function renderWCRound(){
+  var round=WC_ROUNDS[currentWCRound];
+  var label=document.getElementById('wc-round-title');
+  var container=document.getElementById('wc-round-picks');
+  var prevBtn=document.getElementById('wc-round-prev');
+  var nextBtn=document.getElementById('wc-round-next');
+  if(!container)return;
+  if(label)label.textContent=round.label;
+  if(prevBtn)prevBtn.disabled=currentWCRound===0;
+  if(nextBtn)nextBtn.disabled=currentWCRound===WC_ROUNDS.length-1;
+  WC_ROUNDS.forEach(function(_,i){var d=document.getElementById('wcdot-'+i);if(d)d.className='round-dot'+(i===currentWCRound?' active':'');});
+  if(round.key==='champion'){
+    var champ=ACTUAL_RESULTS.champion||null;
+    container.innerHTML='<div class="champ-solo"><div class="champ-card'+(champ?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">World Cup Champion</div><div class="cteam">'+(champ||'TBD')+'</div></div></div>';
+  }else{
+    var html='<div class="round-picks-grid">';
+    for(var i=1;i<=round.n;i++){
+      var team=(ACTUAL_RESULTS[round.key]&&ACTUAL_RESULTS[round.key]['m'+i])||null;
+      var flag=team?getFlag(team):'';
+      html+='<div class="pick-item'+(team?'':' empty')+'">'+(team?flag+' '+team:'TBD')+'</div>';
     }
-  }
-  var ls=rounds[rounds.length-1].querySelectorAll('.b-match-group'),cb=document.querySelector('#wc-btree .b-champ-box .champ-card');
-  if(ls.length>=2&&cb){
-    var s1=ls[0].querySelector('.b-team').getBoundingClientRect();
-    var s2=ls[1].querySelector('.b-team').getBoundingClientRect();
-    var cB=cb.getBoundingClientRect();
-    var lx=s1.right-tr.left,ly1=s1.top+s1.height/2-tr.top,ly2=s2.top+s2.height/2-tr.top;
-    var lxM=(s1.right+cB.left)/2-tr.left,lx3=cB.left-tr.left;
-    var p2=document.createElementNS('http://www.w3.org/2000/svg','path');
-    p2.setAttribute('d','M'+lx+','+ly1+' H'+lxM+' V'+ly2+' H'+lx+' M'+lxM+','+((ly1+ly2)/2)+' H'+lx3);
-    p2.setAttribute('fill','none');p2.setAttribute('stroke','#C5D0DC');p2.setAttribute('stroke-width','1.5');
-    svg.appendChild(p2);
+    html+='</div>';
+    container.innerHTML=html;
   }
 }
 
@@ -617,12 +647,8 @@ function initStandings(){
     grid.appendChild(card);
   });
   document.getElementById('wc-bracket-body').innerHTML=buildWCBracketHTML();
-  setTimeout(drawWCLines,50);
+  renderWCRound();
 }
-
-window.addEventListener('resize',function(){
-  if(document.getElementById('standings').classList.contains('active'))drawWCLines();
-});
 
 initLeaderboard();
 initBrackets();
