@@ -321,7 +321,7 @@ function initLeaderboard(){
     row.className='lb-row data-row'+(p.rank===1?' rank-1':'');
     row.innerHTML='<div class="rank-badge '+(p.rank<=3?'r'+p.rank:'')+'">'+p.rank+'</div>'+
       '<div class="player-name"><div class="avatar '+(p.rank===1?'r1':'')+'">'+p.name.slice(0,2).toUpperCase()+'</div>'+
-      '<div><div>'+p.name+'</div><div class="champ-pick">🏆 '+p.champion+'</div></div></div>'+
+      '<div><div>'+p.name+'</div><div class="champ-pick">🏆 '+getFlag(p.champion)+' '+p.champion+'</div></div></div>'+
       '<div class="pts-cell"><span class="big">'+s.total+'</span><span class="label">pts</span></div>'+
       '<div class="pts-cell"><button class="view-btn" onclick="showBracket(\''+p.id+'\')">View bracket →</button></div>';
     body.appendChild(row);
@@ -416,7 +416,7 @@ function renderKnockoutRound(picks){
     var cp=picks.champion||null,ca=ACTUAL_RESULTS.champion||null;
     var cw=ca&&cp&&normalize(cp)===normalize(ca);
     var cpts=cw?'<div style="font-size:.65rem;color:var(--correct);font-weight:700;margin-top:6px">+'+SCORING.champion+' pts</div>':(ca?'<div style="font-size:.65rem;color:var(--wrong);margin-top:6px">'+ca+' won</div>':'');
-    container.innerHTML='<div class="champ-solo"><div class="champ-card'+(cw?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">Champion Pick</div><div class="cteam">'+(cp?getFlag(cp)+' '+cp:'—')+'</div>'+cpts+'</div></div>';
+    container.innerHTML='<div class="champ-solo"><div class="champ-card'+(cw?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">Champion Pick</div><div class="cteam">'+(cp||'—')+'</div>'+cpts+'</div></div>';
   }else{
     var roundActuals=Object.values(ACTUAL_RESULTS[round.key]||{}).filter(Boolean);
     var hasResults=roundActuals.length>0;
