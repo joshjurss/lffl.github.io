@@ -1,86 +1,24 @@
 #!/usr/bin/env python3
 """
 update_standings.py
-Scrapes live 2026 World Cup group standings from FIFA.com using Playwright
-(needed because the page is JavaScript-rendered) and patches ACTUAL_RESULTS,
-LIVE_STANDINGS, and GROUP_STANDINGS in data.js.
+Fetches live 2026 World Cup group standings from the Fotmob API (league ID 77)
+and patches ACTUAL_RESULTS, LIVE_STANDINGS, and GROUP_STANDINGS in data.js.
 
 Run by GitHub Actions every hour. Safe to run manually too.
-Requires: pip install playwright beautifulsoup4 && playwright install chromium
+Requires: pip install requests
 """
 
 import re
 import sys
-from bs4 import BeautifulSoup
+import requests
 
-URL = "https://www.bing.com/sportsdetails?q=world%20cup%20table&sport=Soccer&scenario=League&TimezoneId=Eastern%20Standard%20Time&IANATimezoneId=America/New_York&ISOTimezoneKey=EDT&league=Soccer_InternationalWorldCup&intent=Standings&seasonyear=2026&segment=sports&isl2=true&form=ANAB01&"
+API_URL = "https://www.fotmob.com/api/leagues?id=77"
 DATA_JS = "data.js"
 
 GROUP_KEYS = ["groupA","groupB","groupC","groupD","groupE","groupF",
               "groupG","groupH","groupI","groupJ","groupK","groupL"]
 
 # ── Fetch & parse ────────────────────────────────────────────────────────────
-
-def parse_int(s, default=0):
-    try:
-        return int(str(s).strip())
-    except (ValueError, AttributeError):
-        return default
-
-def fetch_page_html():
-    """Use Playwright to render the Bing sports standings page and return the HTML."""
-    from playwright.sync_api import sync_playwright
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-        page.goto(URL, wait_until="networkidle", timeout=60000)
-        # Wait for standings content to appear
-        try:
-            page.wait_for_selector("table tbody tr, [class*='standing'] tr, [class*='group']", timeout=30000)
-        except Exception:
-            pass
-        html = page.content()
-        browser.close()
-    return html
-
-def parse_team_rows(table):
-    """Extract team stat rows from a standings table element."""
-    team_rows = []
-    for row in table.find_all("tr"):
-        cells = row.find_all("td")
-        if len(cells) < 7:
-            continue
-        # Try to find the team name — skip pure-number or empty cells
-        # Bing typically: Rank | Team | GP | W | L | D | GF | GA | GD | Pts
-        # or:             Rank | Team | MP | W | D | L | GF | GA | GD | Pts
-        team_name = cells[1].get_text(separator=" ", strip=True)
-        team_name = re.sub(r"^[\U0001F1E0-\U0001F1FF\U0001F300-\U0001FFFF\s]+", "", team_name).strip()
-        team_name = re.sub(r"^\d+\s*", "", team_name).strip()
-        if not team_name or team_name.isdigit():
-            continue
-
-        nums = []
-        for c in cells[2:]:
-            txt = c.get_text(strip=True)
-            nums.append(parse_int(txt))
-
-        # Need at least 6 numeric columns after team name
-        if len(nums) < 6:
-            continue
-
-        # Bing column order: GP W D L GF GA [GD] [Pts]
-        mp  = nums[0]
-        w   = nums[1]
-        d   = nums[2]
-        l   = nums[3]
-        gf  = nums[4]
-        ga  = nums[5]
-        gd  = gf - ga
-        pts = nums[7] if len(nums) > 7 else (nums[6] if len(nums) > 6 and nums[6] != gd else w * 3 + d)
-
-        team_rows.append(dict(team=team_name, mp=mp, w=w, d=d, l=l,
-                              gf=gf, ga=ga, gd=gd, pts=pts))
-    return team_rows
 
 def fetch_standings():
     """
@@ -89,35 +27,75 @@ def fetch_standings():
     live_standings:  groupX -> [1st, 2nd] based on current standings (None if no matches played)
     group_standings: groupX -> list of {team, mp, w, d, l, gf, ga, gd, pts} for all 4 teams
     """
-    html = fetch_page_html()
-    soup = BeautifulSoup(html, "html.parser")
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Referer": "https://www.fotmob.com/",
+        "Accept": "application/json",
+    }
+    resp = requests.get(API_URL, headers=headers, timeout=15)
+    resp.raise_for_status()
+    data = resp.json()
 
     final_results   = {k: [None, None] for k in GROUP_KEYS}
     live_standings  = {k: [None, None] for k in GROUP_KEYS}
     group_standings = {k: [] for k in GROUP_KEYS}
 
-    # Bing renders each group with a heading (h2/h3/h4/div) containing "Group A" etc.
-    # followed by a table. Try all heading-like elements.
-    all_elements = soup.find_all(["h1","h2","h3","h4","h5","div","span"])
-    found_any = False
+    # Fotmob structure: data["table"] is a list of group table objects
+    # Each has data["data"]["leagueName"] like "Group A" and data["data"]["table"]["all"]
+    table_sections = data.get("table", [])
+    if not table_sections:
+        # Sometimes nested under "standings" or "leagueOverviewTable"
+        table_sections = data.get("standings", data.get("leagueOverviewTable", []))
 
-    for el in all_elements:
-        text = el.get_text(strip=True)
-        m = re.match(r"^Group\s+([A-L])$", text, re.IGNORECASE)
+    found = 0
+    for section in table_sections:
+        section_data = section.get("data", section)
+        league_name = section_data.get("leagueName", section_data.get("name", ""))
+
+        m = re.search(r"Group\s+([A-L])\b", league_name, re.IGNORECASE)
         if not m:
             continue
 
         key = "group" + m.group(1).upper()
-        # Find the next table sibling or descendant
-        table = el.find_next("table")
-        if not table:
-            continue
+        rows_raw = (section_data.get("table", {}).get("all")
+                    or section_data.get("table", {}).get("home")
+                    or section_data.get("rows")
+                    or [])
 
-        team_rows = parse_team_rows(table)
+        team_rows = []
+        for entry in rows_raw:
+            name = entry.get("name", entry.get("teamName", ""))
+            if not name:
+                continue
+
+            mp   = entry.get("played", entry.get("mp", 0))
+            w    = entry.get("wins",   entry.get("w",  0))
+            d    = entry.get("draws",  entry.get("d",  0))
+            l    = entry.get("losses", entry.get("l",  0))
+
+            # Goals: sometimes "scoresStr" = "3-1", sometimes separate gf/ga fields
+            gf, ga = 0, 0
+            if "scoresStr" in entry:
+                parts = str(entry["scoresStr"]).split("-")
+                if len(parts) == 2:
+                    try:
+                        gf, ga = int(parts[0]), int(parts[1])
+                    except ValueError:
+                        pass
+            else:
+                gf = entry.get("gf", entry.get("goalsFor", 0))
+                ga = entry.get("ga", entry.get("goalsAgainst", 0))
+
+            gd  = gf - ga
+            pts = entry.get("pts", entry.get("points", w * 3 + d))
+
+            team_rows.append(dict(team=name, mp=mp, w=w, d=d, l=l,
+                                  gf=gf, ga=ga, gd=gd, pts=pts))
+
         if not team_rows:
             continue
 
-        found_any = True
+        found += 1
         group_standings[key] = team_rows
         teams   = [r["team"] for r in team_rows]
         mp_vals = [r["mp"]   for r in team_rows]
@@ -128,9 +106,10 @@ def fetch_standings():
         if len(mp_vals) == 4 and all(mp == 3 for mp in mp_vals) and len(teams) >= 2:
             final_results[key] = [teams[0], teams[1]]
 
-    if not found_any:
-        print("WARNING: No group standings found in page. Check selectors or page structure.")
-        print("Page snippet:", soup.get_text()[:2000])
+    print(f"Found standings for {found}/12 groups.")
+    if found == 0:
+        print("WARNING: No group data found. Top-level keys in response:")
+        print(list(data.keys()))
 
     return final_results, live_standings, group_standings
 
@@ -138,7 +117,6 @@ def fetch_standings():
 # ── Patch data.js ────────────────────────────────────────────────────────────
 
 def build_group_js(standings):
-    """Build JS lines for all 12 groups (simple [team, team] arrays)."""
     lines = []
     for key in GROUP_KEYS:
         first, second = standings[key]
@@ -148,9 +126,7 @@ def build_group_js(standings):
             lines.append(f'  {key}: [null, null],')
     return "\n".join(lines)
 
-
 def build_group_standings_js(group_standings):
-    """Build JS rows for GROUP_STANDINGS between marker comments."""
     lines = []
     for key in GROUP_KEYS:
         rows = group_standings[key]
@@ -166,7 +142,6 @@ def build_group_standings_js(group_standings):
             lines.append(f'  {key}: [{",".join(team_strs)}],')
     return "\n".join(lines)
 
-
 def patch_data_js(final_results, live_standings, group_standings):
     with open(DATA_JS, "r", encoding="utf-8") as f:
         content = f.read()
@@ -179,12 +154,10 @@ def patch_data_js(final_results, live_standings, group_standings):
         print("WARNING: Could not find ACTUAL_RESULTS group block in data.js.")
         sys.exit(1)
 
-    # Patch LIVE_STANDINGS block (simple arrays, no nested {})
+    # Patch LIVE_STANDINGS block
     live_block = build_group_js(live_standings)
     live_pattern = re.compile(r"(const LIVE_STANDINGS\s*=\s*\{)[^}]*(};)", re.DOTALL)
-    new_content, live_count = live_pattern.subn(r"\g<1>\n" + live_block + r"\n\g<2>", new_content)
-    if live_count == 0:
-        print("WARNING: Could not find LIVE_STANDINGS block in data.js.")
+    new_content, _ = live_pattern.subn(r"\g<1>\n" + live_block + r"\n\g<2>", new_content)
 
     # Patch GROUP_STANDINGS block using marker comments
     gs_block = build_group_standings_js(group_standings)
@@ -192,9 +165,7 @@ def patch_data_js(final_results, live_standings, group_standings):
         r"(// __GROUP_STANDINGS_START__\n).*?(// __GROUP_STANDINGS_END__)",
         re.DOTALL
     )
-    new_content, gs_count = gs_pattern.subn(r"\g<1>" + gs_block + r"\n\g<2>", new_content)
-    if gs_count == 0:
-        print("WARNING: Could not find GROUP_STANDINGS markers in data.js.")
+    new_content, _ = gs_pattern.subn(r"\g<1>" + gs_block + r"\n\g<2>", new_content)
 
     # Update LAST_UPDATED timestamp
     from datetime import datetime, timezone
@@ -212,7 +183,7 @@ def patch_data_js(final_results, live_standings, group_standings):
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print(f"Fetching standings from {URL} ...")
+    print(f"Fetching standings from Fotmob API (league 77)...")
     try:
         final_results, live_standings, group_standings = fetch_standings()
     except Exception as e:
