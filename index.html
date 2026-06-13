@@ -48,7 +48,7 @@
     h1 span{color:var(--red);}
     .subtitle{color:var(--muted);font-size:.9rem;margin-top:4px;margin-bottom:1.5rem;}
     .lb-table{background:var(--white);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
-    .lb-row{display:grid;grid-template-columns:52px 1fr 100px 100px 130px;align-items:center;padding:0 1rem;height:56px;border-bottom:1px solid var(--border);transition:background .12s;}
+    .lb-row{display:grid;grid-template-columns:52px 1fr 100px 130px;align-items:center;padding:0 1rem;height:56px;border-bottom:1px solid var(--border);transition:background .12s;}
     .lb-row:last-child{border-bottom:none;}
     .lb-row.data-row:hover{background:var(--off);cursor:pointer;}
     .lb-row.header-row{height:40px;background:var(--navy);color:rgba(255,255,255,.6);font-size:.75rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;}
@@ -201,7 +201,6 @@
     <div class="lb-row header-row">
       <div>#</div><div>Player</div>
       <div class="pts-cell" style="text-align:right">Points</div>
-      <div class="col-correct pts-cell" style="text-align:right">Correct</div>
       <div class="pts-cell" style="text-align:right">Champion Pick</div>
     </div>
     <div id="lb-body"></div>
@@ -324,7 +323,6 @@ function initLeaderboard(){
       '<div class="player-name"><div class="avatar '+(p.rank===1?'r1':'')+'">'+p.name.slice(0,2).toUpperCase()+'</div>'+
       '<div><div>'+p.name+'</div><div class="champ-pick">🏆 '+p.champion+'</div></div></div>'+
       '<div class="pts-cell"><span class="big">'+s.total+'</span><span class="label">pts</span></div>'+
-      '<div class="col-correct pts-cell"><span class="big">'+correct+'</span><span class="label">correct</span></div>'+
       '<div class="pts-cell"><button class="view-btn" onclick="showBracket(\''+p.id+'\')">View bracket →</button></div>';
     body.appendChild(row);
   });
@@ -418,7 +416,7 @@ function renderKnockoutRound(picks){
     var cp=picks.champion||null,ca=ACTUAL_RESULTS.champion||null;
     var cw=ca&&cp&&normalize(cp)===normalize(ca);
     var cpts=cw?'<div style="font-size:.65rem;color:var(--correct);font-weight:700;margin-top:6px">+'+SCORING.champion+' pts</div>':(ca?'<div style="font-size:.65rem;color:var(--wrong);margin-top:6px">'+ca+' won</div>':'');
-    container.innerHTML='<div class="champ-solo"><div class="champ-card'+(cw?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">Champion Pick</div><div class="cteam">'+(cp||'—')+'</div>'+cpts+'</div></div>';
+    container.innerHTML='<div class="champ-solo"><div class="champ-card'+(cw?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">Champion Pick</div><div class="cteam">'+(cp?getFlag(cp)+' '+cp:'—')+'</div>'+cpts+'</div></div>';
   }else{
     var roundActuals=Object.values(ACTUAL_RESULTS[round.key]||{}).filter(Boolean);
     var hasResults=roundActuals.length>0;
