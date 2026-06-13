@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "2026-06-13 04:33 UTC"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-06-13 04:39 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
@@ -82,6 +82,7 @@ const LIVE_STANDINGS = {
 // Best 8 third-place teams that currently qualify for the Round of 32
 const LIVE_THIRDS = [
 // __LIVE_THIRDS_START__
+  "Czechia"
 // __LIVE_THIRDS_END__
 ];
 
