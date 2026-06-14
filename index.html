@@ -628,9 +628,9 @@ function fetchGames(){
   var el=document.getElementById('games-list');
   if(!el.children.length)el.innerHTML='<div class="sidebar-empty">Loading…</div>';
   var now=new Date();
-  var dates=[localDateStr(now)];
+  var yesterday=new Date(now);yesterday.setDate(yesterday.getDate()-1);
   var tomorrow=new Date(now);tomorrow.setDate(tomorrow.getDate()+1);
-  dates.push(localDateStr(tomorrow));
+  var dates=[localDateStr(yesterday),localDateStr(now),localDateStr(tomorrow)];
   Promise.all(dates.map(function(dt){
     return fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+dt)
       .then(function(r){return r.json();});
@@ -671,8 +671,8 @@ function renderGames(events){
     var st=event.status&&event.status.type;
     var stName=st?st.name:'';
     var detail=st?st.shortDetail:'';
-    var isLive=stName==='STATUS_IN_PROGRESS';
-    var isFinal=stName==='STATUS_FINAL';
+    var isLive=stName==='STATUS_IN_PROGRESS'||stName==='STATUS_HALFTIME';
+    var isFinal=/STATUS_FINAL|STATUS_FULL_TIME|STATUS_FT/.test(stName);
     var isScheduled=!isLive&&!isFinal;
     var gameDate=new Date(event.date);
     var dateLabel=gameDate.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});
