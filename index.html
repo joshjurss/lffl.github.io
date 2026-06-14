@@ -527,7 +527,7 @@ var FLAG_CODE={
   'canada':'ca','bosnia and herzegovina':'ba','bosnia-herzegovina':'ba','qatar':'qa','switzerland':'ch',
   'brazil':'br','morocco':'ma','haiti':'ht','scotland':'gb-sct',
   'united states':'us','usa':'us','australia':'au','paraguay':'py','turkey':'tr','türkiye':'tr',
-  'germany':'de','ecuador':'ec','ivory coast':'ci','côte d\'ivoire':'ci','curacao':'cw',
+  'germany':'de','ecuador':'ec','ivory coast':'ci','côte d\'ivoire':'ci','curacao':'cw','curaçao':'cw',
   'netherlands':'nl','japan':'jp','tunisia':'tn','sweden':'se',
   'belgium':'be','iran':'ir','egypt':'eg','new zealand':'nz',
   'spain':'es','uruguay':'uy','saudi arabia':'sa','cape verde':'cv',
@@ -542,7 +542,7 @@ var FLAG_EMOJI={
   'canada':'🇨🇦','bosnia and herzegovina':'🇧🇦','bosnia-herzegovina':'🇧🇦','qatar':'🇶🇦','switzerland':'🇨🇭',
   'brazil':'🇧🇷','morocco':'🇲🇦','haiti':'🇭🇹','scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿',
   'united states':'🇺🇸','usa':'🇺🇸','australia':'🇦🇺','paraguay':'🇵🇾','turkey':'🇹🇷','türkiye':'🇹🇷',
-  'germany':'🇩🇪','ecuador':'🇪🇨','ivory coast':'🇨🇮','côte d\'ivoire':'🇨🇮','curacao':'🇨🇼',
+  'germany':'🇩🇪','ecuador':'🇪🇨','ivory coast':'🇨🇮','côte d\'ivoire':'🇨🇮','curacao':'🇨🇼','curaçao':'🇨🇼',
   'netherlands':'🇳🇱','japan':'🇯🇵','tunisia':'🇹🇳','sweden':'🇸🇪',
   'belgium':'🇧🇪','iran':'🇮🇷','egypt':'🇪🇬','new zealand':'🇳🇿',
   'spain':'🇪🇸','uruguay':'🇺🇾','saudi arabia':'🇸🇦','cape verde':'🇨🇻',
@@ -698,6 +698,77 @@ function renderGames(events){
   el.innerHTML=html;
 }
 
+// ── KNOCKOUT RESULTS FROM ESPN ────────────────────────────────
+// WC 2026 knockout dates: July 5-26, 2026
+var KNOCKOUT_DATE_RANGES=['20260705','20260706','20260707','20260710','20260711','20260716','20260717','20260721','20260722','20260726'];
+var ROUND_KEY_MAP={
+  'R32':'roundOf32','OF32':'roundOf32','ROUND OF 32':'roundOf32',
+  'R16':'roundOf16','OF16':'roundOf16','ROUND OF 16':'roundOf16',
+  'QF':'quarterFinal','QUARTERFINAL':'quarterFinal','QUARTER-FINAL':'quarterFinal',
+  'SF':'semiFinal','SEMIFINAL':'semiFinal','SEMI-FINAL':'semiFinal',
+  'F':'final','FINAL':'final','CHAMPIONSHIP':'final'
+};
+function detectRoundKey(comp){
+  var t=comp.type||{};
+  var candidates=[t.abbreviation,t.text,t.description,t.name];
+  for(var i=0;i<candidates.length;i++){
+    if(!candidates[i])continue;
+    var up=candidates[i].toUpperCase().trim();
+    if(ROUND_KEY_MAP[up])return ROUND_KEY_MAP[up];
+    if(/32/.test(up))return'roundOf32';
+    if(/16/.test(up))return'roundOf16';
+    if(/QUART/i.test(up))return'quarterFinal';
+    if(/SEMI/i.test(up))return'semiFinal';
+    if(/^FINAL$|^F$|CHAMPION/i.test(up))return'final';
+  }
+  return null;
+}
+function fetchKnockoutResults(){
+  Promise.all(KNOCKOUT_DATE_RANGES.map(function(dt){
+    return fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+dt)
+      .then(function(r){return r.json();}).catch(function(){return{events:[]};});
+  })).then(function(responses){
+    var seen={},slots={roundOf32:[],roundOf16:[],quarterFinal:[],semiFinal:[],final:[]};
+    responses.forEach(function(data){
+      (data.events||[]).forEach(function(event){
+        if(seen[event.id])return; seen[event.id]=true;
+        var comp=event.competitions&&event.competitions[0];
+        if(!comp)return;
+        var st=event.status&&event.status.type;
+        if(!st||!st.completed)return;
+        var roundKey=detectRoundKey(comp);
+        if(!roundKey)return;
+        var competitors=comp.competitors||[];
+        if(roundKey==='final'){
+          // Store both finalists so both show green in the Final bracket
+          competitors.forEach(function(c){
+            var name=c.team&&(c.team.displayName||c.team.name);
+            if(name)slots.final.push(name);
+          });
+          var winner=competitors.find(function(c){return c.winner;});
+          if(winner){var wn=winner.team&&(winner.team.displayName||winner.team.name);if(wn)ACTUAL_RESULTS.champion=wn;}
+        }else{
+          var winner=competitors.find(function(c){return c.winner;});
+          if(winner){var wn=winner.team&&(winner.team.displayName||winner.team.name);if(wn)slots[roundKey].push(wn);}
+        }
+      });
+    });
+    var changed=false;
+    ['roundOf32','roundOf16','quarterFinal','semiFinal','final'].forEach(function(key){
+      if(!slots[key].length||!ACTUAL_RESULTS[key])return;
+      slots[key].forEach(function(team,i){
+        if(ACTUAL_RESULTS[key]['m'+(i+1)]!==team){ACTUAL_RESULTS[key]['m'+(i+1)]=team;changed=true;}
+      });
+    });
+    if(changed){
+      initLeaderboard();
+      var rp=document.getElementById('round-picks');
+      if(rp&&currentPerson)renderKnockoutRound(BRACKET_PICKS[currentPerson]);
+    }
+  }).catch(function(e){console.warn('Could not fetch knockout results:',e);});
+}
+
+fetchKnockoutResults();
 initLeaderboard();
 initBrackets();
 initStandings();

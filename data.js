@@ -22,12 +22,12 @@ var LAST_UPDATED = "2026-06-14 13:43 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
-  roundOf32:    1,
-  roundOf16:    2,
-  quarterFinal: 4,
-  semiFinal:    6,
-  final:        8,
-  champion:     16,  // bonus for picking the winner
+  roundOf32:    2,   // correctly predicting who advances to R16
+  roundOf16:    4,   // correctly predicting who advances to Elite 8
+  quarterFinal: 8,   // correctly predicting who advances to Final 4
+  semiFinal:    10,  // correctly predicting who advances to the Final
+  final:        0,   // display only — covered by semiFinal scoring
+  champion:     15,  // bonus for picking the winner
 };
 
 // ── ACTUAL RESULTS ────────────────────────────────────────────
@@ -55,6 +55,7 @@ const ACTUAL_RESULTS = {
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   semiFinal:    { m1:null,m2:null,m3:null,m4:null },
+  final:        { m1:null,m2:null },
   champion:     null,
 };
 
