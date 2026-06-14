@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "2026-06-13 14:36 UTC"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-06-14 11:31 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
@@ -65,8 +65,8 @@ const LIVE_STANDINGS = {
 // __LIVE_STANDINGS_START__
   groupA: ["Mexico", "South Korea"],
   groupB: ["Canada", "Bosnia-Herzegovina"],
-  groupC: [null, null],
-  groupD: ["United States", "Türkiye"],
+  groupC: ["Scotland", "Brazil"],
+  groupD: ["United States", "Australia"],
   groupE: [null, null],
   groupF: [null, null],
   groupG: [null, null],
@@ -81,7 +81,7 @@ const LIVE_STANDINGS = {
 // Best 8 third-place teams that currently qualify for the Round of 32
 const LIVE_THIRDS = [
 // __LIVE_THIRDS_START__
-  "Czechia"
+  "Switzerland", "Morocco", "Czechia", "Türkiye"
 // __LIVE_THIRDS_END__
 ];
 
@@ -91,9 +91,9 @@ const LIVE_THIRDS = [
 const GROUP_STANDINGS = {
 // __GROUP_STANDINGS_START__
   groupA: [{team:"Mexico",mp:1,w:1,d:0,l:0,gf:2,ga:0,gd:2,pts:3},{team:"South Korea",mp:1,w:1,d:0,l:0,gf:2,ga:1,gd:1,pts:3},{team:"Czechia",mp:1,w:0,d:0,l:1,gf:1,ga:2,gd:-1,pts:0},{team:"South Africa",mp:1,w:0,d:0,l:1,gf:0,ga:2,gd:-2,pts:0}],
-  groupB: [{team:"Canada",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Bosnia-Herzegovina",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Switzerland",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Qatar",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
-  groupC: [{team:"Brazil",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Scotland",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Haiti",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Morocco",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
-  groupD: [{team:"United States",mp:1,w:1,d:0,l:0,gf:4,ga:1,gd:3,pts:3},{team:"Türkiye",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Australia",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Paraguay",mp:1,w:0,d:0,l:1,gf:1,ga:4,gd:-3,pts:0}],
+  groupB: [{team:"Canada",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Bosnia-Herzegovina",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Switzerland",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Qatar",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1}],
+  groupC: [{team:"Scotland",mp:1,w:1,d:0,l:0,gf:1,ga:0,gd:1,pts:3},{team:"Brazil",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Morocco",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Haiti",mp:1,w:0,d:0,l:1,gf:0,ga:1,gd:-1,pts:0}],
+  groupD: [{team:"United States",mp:1,w:1,d:0,l:0,gf:4,ga:1,gd:3,pts:3},{team:"Australia",mp:1,w:1,d:0,l:0,gf:2,ga:0,gd:2,pts:3},{team:"Türkiye",mp:1,w:0,d:0,l:1,gf:0,ga:2,gd:-2,pts:0},{team:"Paraguay",mp:1,w:0,d:0,l:1,gf:1,ga:4,gd:-3,pts:0}],
   groupE: [{team:"Ecuador",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Germany",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Ivory Coast",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Curaçao",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
   groupF: [{team:"Netherlands",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Sweden",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Japan",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Tunisia",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
   groupG: [{team:"Belgium",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Iran",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Egypt",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"New Zealand",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
