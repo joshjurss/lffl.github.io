@@ -127,7 +127,7 @@
     .champ-solo .champ-card{max-width:200px;}
     .flag-emoji{display:none;}
     .flag-img{display:inline;}
-    @media(max-width:600px){.flag-img{display:none;}.flag-emoji{display:inline;}}
+    @media(max-width:768px){.flag-img{display:none;}.flag-emoji{display:inline;}}
     .games-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:var(--white);font-family:'Inter',sans-serif;font-size:.8rem;font-weight:500;padding:6px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:background .15s;margin-left:8px;}
     .games-btn:hover{background:rgba(255,255,255,.22);}
     .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:199;cursor:pointer;}
@@ -151,15 +151,15 @@
     .game-score{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:var(--muted);min-width:14px;text-align:right;}
     .game-score.lead{color:var(--navy);}
     .sidebar-empty{padding:1.5rem 1rem;color:var(--muted);font-style:italic;font-size:.88rem;}
-    @media(max-width:480px){.sidebar{width:100vw;right:-100vw;}}
-    @media(max-width:600px){
+    @media(max-width:600px){.sidebar{width:100vw;right:-100vw;}}
+    @media(max-width:768px){
       .lb-row{grid-template-columns:44px 1fr 72px;}
       .lb-champ-col{display:none;}
       .standings-grid{grid-template-columns:1fr;}
       .view{padding:1.5rem 1rem;}
       h1{font-size:1.9rem;}
     }
-    @media(max-width:480px){
+    @media(max-width:600px){
       header{height:auto;padding:.5rem 1rem;flex-wrap:wrap;gap:4px;}
       .logo{font-size:1.3rem;width:100%;}
       .games-btn{width:100%;text-align:center;margin-left:0;}
