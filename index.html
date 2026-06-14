@@ -617,16 +617,21 @@ function closeSidebar(){
   clearTimeout(sidebarRefreshTimer);
 }
 
+function localDateStr(d){
+  var y=d.getFullYear();
+  var m=String(d.getMonth()+1).padStart(2,'0');
+  var day=String(d.getDate()).padStart(2,'0');
+  return y+m+day;
+}
+
 function fetchGames(){
   clearTimeout(sidebarRefreshTimer);
   var el=document.getElementById('games-list');
   if(!el.children.length)el.innerHTML='<div class="sidebar-empty">Loading…</div>';
   var now=new Date();
-  var dates=[];
-  for(var i=0;i<2;i++){
-    var d=new Date(now);d.setDate(d.getDate()+i);
-    dates.push(d.toISOString().slice(0,10).replace(/-/g,''));
-  }
+  var dates=[localDateStr(now)];
+  var tomorrow=new Date(now);tomorrow.setDate(tomorrow.getDate()+1);
+  dates.push(localDateStr(tomorrow));
   Promise.all(dates.map(function(dt){
     return fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+dt)
       .then(function(r){return r.json();});
@@ -637,10 +642,16 @@ function fetchGames(){
     });
     events.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
     renderGames(events);
-    var hasLive=events.some(function(e){return e.status&&e.status.type&&e.status.type.name==='STATUS_IN_PROGRESS';});
-    var allFinal=events.length>0&&events.every(function(e){return e.status&&e.status.type&&(e.status.type.name==='STATUS_FINAL'||e.status.type.name==='STATUS_POSTPONED');});
+    var hasLive=events.some(function(e){
+      var s=e.status&&e.status.type&&e.status.type.name||'';
+      return s==='STATUS_IN_PROGRESS'||s==='STATUS_HALFTIME';
+    });
+    var allDone=events.length>0&&events.every(function(e){
+      var s=e.status&&e.status.type&&e.status.type.name||'';
+      return s==='STATUS_FINAL'||s==='STATUS_FULL_TIME'||s==='STATUS_POSTPONED'||s==='STATUS_CANCELED';
+    });
     var sb=document.getElementById('sidebar');
-    if(!allFinal&&sb&&sb.classList.contains('open')){
+    if(!allDone&&sb&&sb.classList.contains('open')){
       sidebarRefreshTimer=setTimeout(fetchGames,hasLive?30000:60000);
     }
   }).catch(function(){
