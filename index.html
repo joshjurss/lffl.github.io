@@ -570,10 +570,7 @@ function initStandings(){
     var rows=(GROUP_STANDINGS[g]||[]).slice().sort(function(a,b){return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf;});
     var card=document.createElement('div');card.className='fm-card';
     var header='<div class="fm-header">'+groupLabels[g]+'</div>';
-    var anyPlayed=rows.some(function(t){return t.mp>0;});
-    if(!anyPlayed){
-      card.innerHTML=header+'<div class="fm-no-data">No matches played yet</div>';
-    }else{
+    {
       var tbody='';
       rows.forEach(function(t,i){
         var gdCls=t.gd>0?'pos':t.gd<0?'neg':'';
