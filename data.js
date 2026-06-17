@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "2026-06-17 00:18 UTC"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-06-17 06:14 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
@@ -73,7 +73,7 @@ const LIVE_STANDINGS = {
   groupG: ["Iran", "New Zealand"],
   groupH: ["Uruguay", "Saudi Arabia"],
   groupI: ["Norway", "France"],
-  groupJ: [null, null],
+  groupJ: ["Argentina", "Austria"],
   groupK: [null, null],
   groupL: [null, null],
 // __LIVE_STANDINGS_END__
@@ -100,7 +100,7 @@ const GROUP_STANDINGS = {
   groupG: [{team:"Iran",mp:1,w:0,d:1,l:0,gf:2,ga:2,gd:0,pts:1},{team:"New Zealand",mp:1,w:0,d:1,l:0,gf:2,ga:2,gd:0,pts:1},{team:"Belgium",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Egypt",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1}],
   groupH: [{team:"Uruguay",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Saudi Arabia",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Spain",mp:1,w:0,d:1,l:0,gf:0,ga:0,gd:0,pts:1},{team:"Cape Verde",mp:1,w:0,d:1,l:0,gf:0,ga:0,gd:0,pts:1}],
   groupI: [{team:"Norway",mp:1,w:1,d:0,l:0,gf:4,ga:1,gd:3,pts:3},{team:"France",mp:1,w:1,d:0,l:0,gf:3,ga:1,gd:2,pts:3},{team:"Senegal",mp:1,w:0,d:0,l:1,gf:1,ga:3,gd:-2,pts:0},{team:"Iraq",mp:1,w:0,d:0,l:1,gf:1,ga:4,gd:-3,pts:0}],
-  groupJ: [{team:"Argentina",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Austria",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Algeria",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Jordan",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
+  groupJ: [{team:"Argentina",mp:1,w:1,d:0,l:0,gf:3,ga:0,gd:3,pts:3},{team:"Austria",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Jordan",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Algeria",mp:1,w:0,d:0,l:1,gf:0,ga:3,gd:-3,pts:0}],
   groupK: [{team:"Colombia",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Portugal",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Uzbekistan",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Congo DR",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
   groupL: [{team:"England",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Croatia",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Panama",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0},{team:"Ghana",mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}],
 // __GROUP_STANDINGS_END__
