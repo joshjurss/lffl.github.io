@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "2026-06-19 20:41 UTC"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-06-19 22:05 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
@@ -94,7 +94,7 @@ const GROUP_STANDINGS = {
   groupA: [{team:"Mexico",mp:2,w:2,d:0,l:0,gf:3,ga:0,gd:3,pts:6},{team:"South Korea",mp:2,w:1,d:0,l:1,gf:2,ga:2,gd:0,pts:3},{team:"Czechia",mp:2,w:0,d:1,l:1,gf:2,ga:3,gd:-1,pts:1},{team:"South Africa",mp:2,w:0,d:1,l:1,gf:1,ga:3,gd:-2,pts:1}],
   groupB: [{team:"Canada",mp:2,w:1,d:1,l:0,gf:7,ga:1,gd:6,pts:4},{team:"Switzerland",mp:2,w:1,d:1,l:0,gf:5,ga:2,gd:3,pts:4},{team:"Bosnia-Herzegovina",mp:2,w:0,d:1,l:1,gf:2,ga:5,gd:-3,pts:1},{team:"Qatar",mp:2,w:0,d:1,l:1,gf:1,ga:7,gd:-6,pts:1}],
   groupC: [{team:"Scotland",mp:1,w:1,d:0,l:0,gf:1,ga:0,gd:1,pts:3},{team:"Brazil",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Morocco",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Haiti",mp:1,w:0,d:0,l:1,gf:0,ga:1,gd:-1,pts:0}],
-  groupD: [{team:"United States",mp:1,w:1,d:0,l:0,gf:4,ga:1,gd:3,pts:3},{team:"Australia",mp:1,w:1,d:0,l:0,gf:2,ga:0,gd:2,pts:3},{team:"Türkiye",mp:1,w:0,d:0,l:1,gf:0,ga:2,gd:-2,pts:0},{team:"Paraguay",mp:1,w:0,d:0,l:1,gf:1,ga:4,gd:-3,pts:0}],
+  groupD: [{team:"United States",mp:2,w:2,d:0,l:0,gf:6,ga:1,gd:5,pts:6},{team:"Australia",mp:2,w:1,d:0,l:1,gf:2,ga:2,gd:0,pts:3},{team:"Türkiye",mp:1,w:0,d:0,l:1,gf:0,ga:2,gd:-2,pts:0},{team:"Paraguay",mp:1,w:0,d:0,l:1,gf:1,ga:4,gd:-3,pts:0}],
   groupE: [{team:"Germany",mp:1,w:1,d:0,l:0,gf:7,ga:1,gd:6,pts:3},{team:"Ivory Coast",mp:1,w:1,d:0,l:0,gf:1,ga:0,gd:1,pts:3},{team:"Ecuador",mp:1,w:0,d:0,l:1,gf:0,ga:1,gd:-1,pts:0},{team:"Curaçao",mp:1,w:0,d:0,l:1,gf:1,ga:7,gd:-6,pts:0}],
   groupF: [{team:"Sweden",mp:1,w:1,d:0,l:0,gf:5,ga:1,gd:4,pts:3},{team:"Netherlands",mp:1,w:0,d:1,l:0,gf:2,ga:2,gd:0,pts:1},{team:"Japan",mp:1,w:0,d:1,l:0,gf:2,ga:2,gd:0,pts:1},{team:"Tunisia",mp:1,w:0,d:0,l:1,gf:1,ga:5,gd:-4,pts:0}],
   groupG: [{team:"Iran",mp:1,w:0,d:1,l:0,gf:2,ga:2,gd:0,pts:1},{team:"New Zealand",mp:1,w:0,d:1,l:0,gf:2,ga:2,gd:0,pts:1},{team:"Belgium",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1},{team:"Egypt",mp:1,w:0,d:1,l:0,gf:1,ga:1,gd:0,pts:1}],
