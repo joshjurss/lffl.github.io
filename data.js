@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "2026-06-27 00:10 UTC"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-06-27 04:55 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
@@ -43,7 +43,7 @@ const ACTUAL_RESULTS = {
   groupE: ["Germany", "Ivory Coast"],
   groupF: ["Netherlands", "Japan"],
   groupG: [null, null],
-  groupH: [null, null],
+  groupH: ["Spain", "Cape Verde"],
   groupI: ["France", "Norway"],
   groupJ: [null, null],
   groupK: [null, null],
@@ -71,7 +71,7 @@ const LIVE_STANDINGS = {
   groupE: ["Germany", "Ivory Coast"],
   groupF: ["Netherlands", "Japan"],
   groupG: ["Egypt", "Iran"],
-  groupH: ["Spain", "Uruguay"],
+  groupH: ["Spain", "Cape Verde"],
   groupI: ["France", "Norway"],
   groupJ: ["Argentina", "Austria"],
   groupK: ["Colombia", "Portugal"],
@@ -98,7 +98,7 @@ const GROUP_STANDINGS = {
   groupE: [{team:"Germany",mp:3,w:2,d:0,l:1,gf:10,ga:4,gd:6,pts:6},{team:"Ivory Coast",mp:3,w:2,d:0,l:1,gf:4,ga:2,gd:2,pts:6},{team:"Ecuador",mp:3,w:1,d:1,l:1,gf:2,ga:2,gd:0,pts:4},{team:"Curaçao",mp:3,w:0,d:1,l:2,gf:1,ga:9,gd:-8,pts:1}],
   groupF: [{team:"Netherlands",mp:3,w:2,d:1,l:0,gf:10,ga:4,gd:6,pts:7},{team:"Japan",mp:3,w:1,d:2,l:0,gf:7,ga:3,gd:4,pts:5},{team:"Sweden",mp:3,w:1,d:1,l:1,gf:7,ga:7,gd:0,pts:4},{team:"Tunisia",mp:3,w:0,d:0,l:3,gf:2,ga:12,gd:-10,pts:0}],
   groupG: [{team:"Egypt",mp:2,w:1,d:1,l:0,gf:4,ga:2,gd:2,pts:4},{team:"Iran",mp:2,w:0,d:2,l:0,gf:2,ga:2,gd:0,pts:2},{team:"Belgium",mp:2,w:0,d:2,l:0,gf:1,ga:1,gd:0,pts:2},{team:"New Zealand",mp:2,w:0,d:1,l:1,gf:3,ga:5,gd:-2,pts:1}],
-  groupH: [{team:"Spain",mp:2,w:1,d:1,l:0,gf:4,ga:0,gd:4,pts:4},{team:"Uruguay",mp:2,w:0,d:2,l:0,gf:3,ga:3,gd:0,pts:2},{team:"Cape Verde",mp:2,w:0,d:2,l:0,gf:2,ga:2,gd:0,pts:2},{team:"Saudi Arabia",mp:2,w:0,d:1,l:1,gf:1,ga:5,gd:-4,pts:1}],
+  groupH: [{team:"Spain",mp:3,w:2,d:1,l:0,gf:5,ga:0,gd:5,pts:7},{team:"Cape Verde",mp:3,w:0,d:3,l:0,gf:2,ga:2,gd:0,pts:3},{team:"Uruguay",mp:3,w:0,d:2,l:1,gf:3,ga:4,gd:-1,pts:2},{team:"Saudi Arabia",mp:3,w:0,d:2,l:1,gf:1,ga:5,gd:-4,pts:2}],
   groupI: [{team:"France",mp:3,w:3,d:0,l:0,gf:10,ga:2,gd:8,pts:9},{team:"Norway",mp:3,w:2,d:0,l:1,gf:8,ga:7,gd:1,pts:6},{team:"Senegal",mp:3,w:1,d:0,l:2,gf:8,ga:6,gd:2,pts:3},{team:"Iraq",mp:3,w:0,d:0,l:3,gf:1,ga:12,gd:-11,pts:0}],
   groupJ: [{team:"Argentina",mp:2,w:2,d:0,l:0,gf:5,ga:0,gd:5,pts:6},{team:"Austria",mp:2,w:1,d:0,l:1,gf:3,ga:3,gd:0,pts:3},{team:"Algeria",mp:2,w:1,d:0,l:1,gf:2,ga:4,gd:-2,pts:3},{team:"Jordan",mp:2,w:0,d:0,l:2,gf:2,ga:5,gd:-3,pts:0}],
   groupK: [{team:"Colombia",mp:2,w:2,d:0,l:0,gf:4,ga:1,gd:3,pts:6},{team:"Portugal",mp:2,w:1,d:1,l:0,gf:6,ga:1,gd:5,pts:4},{team:"Congo DR",mp:2,w:0,d:1,l:1,gf:1,ga:2,gd:-1,pts:1},{team:"Uzbekistan",mp:2,w:0,d:0,l:2,gf:1,ga:8,gd:-7,pts:0}],
