@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "2026-06-27 22:04 UTC"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-06-28 00:04 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
@@ -47,7 +47,7 @@ const ACTUAL_RESULTS = {
   groupI: ["France", "Norway"],
   groupJ: [null, null],
   groupK: [null, null],
-  groupL: [null, null],
+  groupL: ["England", "Croatia"],
 // __ACTUAL_RESULTS_END__
 
   // Knockout rounds — fill in winner of each match slot
@@ -75,14 +75,14 @@ const LIVE_STANDINGS = {
   groupI: ["France", "Norway"],
   groupJ: ["Argentina", "Austria"],
   groupK: ["Colombia", "Portugal"],
-  groupL: ["England", "Ghana"],
+  groupL: ["England", "Croatia"],
 // __LIVE_STANDINGS_END__
 };
 
 // Best 8 third-place teams that currently qualify for the Round of 32
 const LIVE_THIRDS = [
 // __LIVE_THIRDS_START__
-  "Sweden", "Ecuador", "Bosnia-Herzegovina", "Paraguay", "Senegal", "Iran", "Croatia", "South Korea"
+  "Sweden", "Ecuador", "Ghana", "Bosnia-Herzegovina", "Paraguay", "Senegal", "Iran", "South Korea"
 // __LIVE_THIRDS_END__
 ];
 
@@ -102,7 +102,7 @@ const GROUP_STANDINGS = {
   groupI: [{team:"France",mp:3,w:3,d:0,l:0,gf:10,ga:2,gd:8,pts:9},{team:"Norway",mp:3,w:2,d:0,l:1,gf:8,ga:7,gd:1,pts:6},{team:"Senegal",mp:3,w:1,d:0,l:2,gf:8,ga:6,gd:2,pts:3},{team:"Iraq",mp:3,w:0,d:0,l:3,gf:1,ga:12,gd:-11,pts:0}],
   groupJ: [{team:"Argentina",mp:2,w:2,d:0,l:0,gf:5,ga:0,gd:5,pts:6},{team:"Austria",mp:2,w:1,d:0,l:1,gf:3,ga:3,gd:0,pts:3},{team:"Algeria",mp:2,w:1,d:0,l:1,gf:2,ga:4,gd:-2,pts:3},{team:"Jordan",mp:2,w:0,d:0,l:2,gf:2,ga:5,gd:-3,pts:0}],
   groupK: [{team:"Colombia",mp:2,w:2,d:0,l:0,gf:4,ga:1,gd:3,pts:6},{team:"Portugal",mp:2,w:1,d:1,l:0,gf:6,ga:1,gd:5,pts:4},{team:"Congo DR",mp:2,w:0,d:1,l:1,gf:1,ga:2,gd:-1,pts:1},{team:"Uzbekistan",mp:2,w:0,d:0,l:2,gf:1,ga:8,gd:-7,pts:0}],
-  groupL: [{team:"England",mp:2,w:1,d:1,l:0,gf:4,ga:2,gd:2,pts:4},{team:"Ghana",mp:2,w:1,d:1,l:0,gf:1,ga:0,gd:1,pts:4},{team:"Croatia",mp:2,w:1,d:0,l:1,gf:3,ga:4,gd:-1,pts:3},{team:"Panama",mp:2,w:0,d:0,l:2,gf:0,ga:2,gd:-2,pts:0}],
+  groupL: [{team:"England",mp:3,w:2,d:1,l:0,gf:6,ga:2,gd:4,pts:7},{team:"Croatia",mp:3,w:2,d:0,l:1,gf:5,ga:5,gd:0,pts:6},{team:"Ghana",mp:3,w:1,d:1,l:1,gf:2,ga:2,gd:0,pts:4},{team:"Panama",mp:3,w:0,d:0,l:3,gf:0,ga:4,gd:-4,pts:0}],
 // __GROUP_STANDINGS_END__
 };
 
