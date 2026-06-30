@@ -493,12 +493,7 @@ function matchupTeamRow(pick,actuals,pts,nextPicks,playedMatchups,roundKey){
   if(roundKey&&isEliminatedBefore(pick,roundKey)){
     return'<div class="matchup-team eliminated">'+getFlag(pick)+' '+pick+'</div>';
   }
-  var scoreInfo=getMatchScore(pick,playedMatchups);
   var scoreHtml='';
-  if(scoreInfo&&scoreInfo.my!=null){
-    var sc=String(scoreInfo.my)+(scoreInfo.myPen!=null?' ('+scoreInfo.myPen+')':'');
-    scoreHtml='<span class="pick-score">'+sc+'</span>';
-  }
   if(playedMatchups&&playedMatchups.length>0){
     var hasPlayed=playedMatchups.some(function(m){return m.winner!==null&&(normalize(m.a)===norm||normalize(m.b)===norm);});
     if(hasPlayed){
