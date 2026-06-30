@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "2026-06-30 12:10 UTC"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-06-30 12:56 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
@@ -52,11 +52,11 @@ const ACTUAL_RESULTS = {
 
   // Knockout rounds — winners populated by CI
 // __KNOCKOUT_RESULTS_START__
-  roundOf32:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null },
-  roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null },
-  quarterFinal: { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
-  semiFinal:    { m1:null,m2:null,m3:null,m4:null },
-  final:        { m1:null,m2:null },
+  roundOf32:    {m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null},
+  roundOf16:    {m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null},
+  quarterFinal:    {m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null},
+  semiFinal:    {m1:null,m2:null,m3:null,m4:null},
+  final:    {m1:null,m2:null},
   champion:     null,
 // __KNOCKOUT_RESULTS_END__
 };
