@@ -185,21 +185,10 @@ def fetch_knockout_results():
             score_a = a_c.get("score") if a_c else None
             score_b = b_c.get("score") if b_c else None
 
-            # Penalty shootout detection
-            is_shootout = comp.get("shootout", False)
-            shootout_a = shootout_b = None
-            if is_shootout:
-                # ESPN uses shootoutScore or falls back to extra linescore entry
-                shootout_a = (a_c.get("shootoutScore") or a_c.get("penaltyScore"))
-                shootout_b = (b_c.get("shootoutScore") or b_c.get("penaltyScore"))
-                if shootout_a is None:
-                    ls = a_c.get("linescores") or []
-                    if len(ls) > 2:
-                        shootout_a = ls[-1].get("displayValue")
-                if shootout_b is None:
-                    ls = b_c.get("linescores") or []
-                    if len(ls) > 2:
-                        shootout_b = ls[-1].get("displayValue")
+            # Penalty shootout: ESPN puts shootoutScore directly on each competitor
+            shootout_a = a_c.get("shootoutScore")
+            shootout_b = b_c.get("shootoutScore")
+            is_shootout = shootout_a is not None or shootout_b is not None
 
             matchups[round_key].append({
                 "a": a, "b": b, "winner": wn if completed else None,
