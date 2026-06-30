@@ -185,7 +185,28 @@ def fetch_knockout_results():
             score_a = a_c.get("score") if a_c else None
             score_b = b_c.get("score") if b_c else None
 
-            matchups[round_key].append({"a": a, "b": b, "winner": wn if completed else None, "scoreA": score_a, "scoreB": score_b})
+            # Penalty shootout detection
+            is_shootout = comp.get("shootout", False)
+            shootout_a = shootout_b = None
+            if is_shootout:
+                # ESPN uses shootoutScore or falls back to extra linescore entry
+                shootout_a = (a_c.get("shootoutScore") or a_c.get("penaltyScore"))
+                shootout_b = (b_c.get("shootoutScore") or b_c.get("penaltyScore"))
+                if shootout_a is None:
+                    ls = a_c.get("linescores") or []
+                    if len(ls) > 2:
+                        shootout_a = ls[-1].get("displayValue")
+                if shootout_b is None:
+                    ls = b_c.get("linescores") or []
+                    if len(ls) > 2:
+                        shootout_b = ls[-1].get("displayValue")
+
+            matchups[round_key].append({
+                "a": a, "b": b, "winner": wn if completed else None,
+                "scoreA": score_a, "scoreB": score_b,
+                "shootout": is_shootout,
+                "shootoutA": shootout_a, "shootoutB": shootout_b,
+            })
 
             if not completed:
                 continue
@@ -209,8 +230,13 @@ def build_matchups_js(matchups):
         if not pairs:
             lines.append(f'  {key}:    [],')
         else:
-            items = [f'{{"a":{json.dumps(m["a"])},"b":{json.dumps(m["b"])},"winner":{json.dumps(m["winner"])},"scoreA":{json.dumps(m.get("scoreA"))},"scoreB":{json.dumps(m.get("scoreB"))}}}'
-                     for m in pairs]
+            items = [
+                f'{{"a":{json.dumps(m["a"])},"b":{json.dumps(m["b"])},"winner":{json.dumps(m["winner"])},'
+                f'"scoreA":{json.dumps(m.get("scoreA"))},"scoreB":{json.dumps(m.get("scoreB"))},'
+                f'"shootout":{json.dumps(bool(m.get("shootout")))},'
+                f'"shootoutA":{json.dumps(m.get("shootoutA"))},"shootoutB":{json.dumps(m.get("shootoutB"))}}}'
+                for m in pairs
+            ]
             lines.append(f'  {key}:    [{",".join(items)}],')
     return "\n".join(lines)
 

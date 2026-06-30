@@ -481,8 +481,8 @@ function getMatchScore(pick,playedMatchups){
   for(var i=0;i<playedMatchups.length;i++){
     var m=playedMatchups[i];
     if(m.winner===null)continue;
-    if(normalize(m.a)===norm)return{my:m.scoreA,their:m.scoreB};
-    if(normalize(m.b)===norm)return{my:m.scoreB,their:m.scoreA};
+    if(normalize(m.a)===norm)return{my:m.scoreA,their:m.scoreB,myPen:m.shootout?m.shootoutA:null,theirPen:m.shootout?m.shootoutB:null,shootout:m.shootout};
+    if(normalize(m.b)===norm)return{my:m.scoreB,their:m.scoreA,myPen:m.shootout?m.shootoutB:null,theirPen:m.shootout?m.shootoutA:null,shootout:m.shootout};
   }
   return null;
 }
@@ -494,7 +494,11 @@ function matchupTeamRow(pick,actuals,pts,nextPicks,playedMatchups,roundKey){
     return'<div class="matchup-team eliminated">'+getFlag(pick)+' '+pick+'</div>';
   }
   var scoreInfo=getMatchScore(pick,playedMatchups);
-  var scoreHtml=scoreInfo&&scoreInfo.my!=null?'<span class="pick-score">'+scoreInfo.my+'</span>':'';
+  var scoreHtml='';
+  if(scoreInfo&&scoreInfo.my!=null){
+    var sc=String(scoreInfo.my)+(scoreInfo.myPen!=null?' ('+scoreInfo.myPen+')':'');
+    scoreHtml='<span class="pick-score">'+sc+'</span>';
+  }
   if(playedMatchups&&playedMatchups.length>0){
     var hasPlayed=playedMatchups.some(function(m){return m.winner!==null&&(normalize(m.a)===norm||normalize(m.b)===norm);});
     if(hasPlayed){
@@ -583,8 +587,14 @@ function renderWCRound(){
         var bWon=m.winner&&normalize(m.winner)===normalize(m.b);
         var aStatus=m.winner?(aWon?'winner':'loser'):'';
         var bStatus=m.winner?(bWon?'winner':'loser'):'';
-        var saHtml=m.winner&&m.scoreA!=null?'<span class="match-score">'+m.scoreA+'</span>':'';
-        var sbHtml=m.winner&&m.scoreB!=null?'<span class="match-score">'+m.scoreB+'</span>':'';
+        function fmtScore(score,pen){
+          if(score==null)return'';
+          var s=String(score);
+          if(pen!=null)s+=' ('+pen+')';
+          return'<span class="match-score">'+s+'</span>';
+        }
+        var saHtml=m.winner?fmtScore(m.scoreA,m.shootout?m.shootoutA:null):'';
+        var sbHtml=m.winner?fmtScore(m.scoreB,m.shootout?m.shootoutB:null):'';
         html+='<div class="matchup-card">'+
           '<div class="matchup-team'+(m.a?' '+aStatus:' empty')+'">'+(m.a?getFlag(m.a)+' '+m.a:'TBD')+saHtml+'</div>'+
           '<div class="matchup-team'+(m.b?' '+bStatus:' empty')+'">'+(m.b?getFlag(m.b)+' '+m.b:'TBD')+sbHtml+'</div>'+
