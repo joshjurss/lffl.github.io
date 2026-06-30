@@ -121,7 +121,9 @@
     .matchup-team+.matchup-team{border-top:1px dashed var(--border);}
     .matchup-team.winner{background:#EDF7F1;color:var(--correct);border-left:3px solid #52B788;}
     .matchup-team.loser{color:#ef4444;background:#FEF2F2;border-left:3px solid #ef4444;}
+    .matchup-team.upset{color:#d97706;background:#FFFBEB;border-left:3px solid #f59e0b;}
     .matchup-team.advance{background:#EFF6FF;color:#1D4ED8;border-left:3px solid #3B82F6;}
+    .matchup-team.eliminated{color:#6B7280;background:#F3F4F6;border:1.5px solid #111827;text-decoration:line-through;}
     .matchup-team.empty{color:#C5CBD3;font-style:italic;}
     .match-score{margin-left:auto;font-weight:700;font-size:.82rem;flex-shrink:0;}
     .pick-pts{font-size:.7rem;font-weight:700;color:var(--correct);margin-left:auto;}
@@ -277,6 +279,20 @@ function scoreGroupStage(picks,actual){
   return{pts:pts,correct:correct,total:total};
 }
 var NEXT_ROUND_KEY={roundOf32:'roundOf16',roundOf16:'quarterFinal',quarterFinal:'semiFinal',semiFinal:'final'};
+var ROUND_ORDER=['roundOf32','roundOf16','quarterFinal','semiFinal','final'];
+function isEliminatedBefore(team,roundKey){
+  var idx=ROUND_ORDER.indexOf(roundKey);
+  if(idx<=0)return false;
+  var norm=normalize(team);
+  for(var i=0;i<idx;i++){
+    var ms=(ACTUAL_MATCHUPS&&ACTUAL_MATCHUPS[ROUND_ORDER[i]])||[];
+    for(var j=0;j<ms.length;j++){
+      var m=ms[j];
+      if(m.winner!==null&&(normalize(m.a)===norm||normalize(m.b)===norm)&&normalize(m.winner)!==norm)return true;
+    }
+  }
+  return false;
+}
 function scoreRound(picks,actual,roundKey,pts){
   var p=0,c=0,t=0,ar=actual[roundKey],pr=picks[roundKey];
   if(!ar||!pr)return{pts:p,correct:c,total:t};
@@ -448,30 +464,35 @@ function renderKnockoutRound(picks){
     for(var i=1;i<=round.n;i+=2){
       var pA=(picks[round.key]&&picks[round.key]['m'+i])||null;
       var pB=(picks[round.key]&&picks[round.key]['m'+(i+1)])||null;
-      html+='<div class="matchup-card">'+matchupTeamRow(pA,roundActuals,round.pts,nextPicks,playedMatchups)+matchupTeamRow(pB,roundActuals,round.pts,nextPicks,playedMatchups)+'</div>';
+      html+='<div class="matchup-card">'+matchupTeamRow(pA,roundActuals,round.pts,nextPicks,playedMatchups,round.key)+matchupTeamRow(pB,roundActuals,round.pts,nextPicks,playedMatchups,round.key)+'</div>';
     }
     html+='</div>';
     container.innerHTML=html;
   }
 }
 
-function matchupTeamRow(pick,actuals,pts,nextPicks,playedMatchups){
+function matchupTeamRow(pick,actuals,pts,nextPicks,playedMatchups,roundKey){
   if(!pick)return'<div class="matchup-team empty">—</div>';
   var cls='',ptsHtml='',norm=normalize(pick);
+  // Eliminated in a prior round → grey strikethrough
+  if(roundKey&&isEliminatedBefore(pick,roundKey)){
+    return'<div class="matchup-team eliminated">'+getFlag(pick)+' '+pick+'</div>';
+  }
   if(playedMatchups&&playedMatchups.length>0){
     var hasPlayed=playedMatchups.some(function(m){return m.winner!==null&&(normalize(m.a)===norm||normalize(m.b)===norm);});
     if(hasPlayed){
       var won=actuals.some(function(a){return teamsMatch(pick,a);});
-      if(!won){cls='loser';}
-      else{
+      if(!won){
+        var hadInNext=nextPicks&&Object.values(nextPicks).some(function(t){return t&&teamsMatch(pick,t);});
+        cls=hadInNext?'loser':'upset';
+      }else{
         var inNext=nextPicks&&Object.values(nextPicks).some(function(t){return t&&teamsMatch(pick,t);});
         if(inNext){cls='winner';if(pts)ptsHtml='<span class="pick-pts">+'+pts+'</span>';}
         else{cls='advance';}
       }
     }
   }else{
-    var hasResults=actuals.length>0;
-    if(hasResults){
+    if(actuals.length>0){
       var correct=actuals.some(function(a){return norm===normalize(a);});
       cls=correct?'winner':'loser';
       if(correct&&pts)ptsHtml='<span class="pick-pts">+'+pts+'</span>';
