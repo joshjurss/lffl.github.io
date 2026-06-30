@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "2026-06-30 13:05 UTC"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-06-30 13:17 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
@@ -66,11 +66,11 @@ const ACTUAL_RESULTS = {
 // Populated by CI — used to render the WC Table bracket correctly.
 const ACTUAL_MATCHUPS = {
 // __ACTUAL_MATCHUPS_START__
-  roundOf32:    [],
-  roundOf16:    [],
-  quarterFinal: [],
-  semiFinal:    [],
-  final:        [],
+  roundOf32:    [{"a":"South Africa","b":"Canada","winner":"Canada"},{"a":"Brazil","b":"Japan","winner":"Brazil"},{"a":"Germany","b":"Paraguay","winner":"Paraguay"},{"a":"Netherlands","b":"Morocco","winner":"Morocco"},{"a":"Ivory Coast","b":"Norway","winner":null},{"a":"France","b":"Sweden","winner":null},{"a":"Mexico","b":"Ecuador","winner":null},{"a":"England","b":"Congo DR","winner":null},{"a":"Belgium","b":"Senegal","winner":null},{"a":"United States","b":"Bosnia-Herzegovina","winner":null},{"a":"Spain","b":"Austria","winner":null},{"a":"Portugal","b":"Croatia","winner":null},{"a":"Switzerland","b":"Algeria","winner":null},{"a":"Australia","b":"Egypt","winner":null},{"a":"Argentina","b":"Cape Verde","winner":null},{"a":"Colombia","b":"Ghana","winner":null}],
+  roundOf16:    [{"a":"Canada","b":"Morocco","winner":null},{"a":"Paraguay","b":"Round of 32 5 Winner","winner":null},{"a":"Brazil","b":"Round of 32 6 Winner","winner":null},{"a":"Round of 32 7 Winner","b":"Round of 32 8 Winner","winner":null},{"a":"Round of 32 11 Winner","b":"Round of 32 12 Winner","winner":null},{"a":"Round of 32 9 Winner","b":"Round of 32 10 Winner","winner":null},{"a":"Round of 32 14 Winner","b":"Round of 32 16 Winner","winner":null},{"a":"Round of 32 13 Winner","b":"Round of 32 15 Winner","winner":null}],
+  quarterFinal:    [{"a":"Round of 16 1 Winner","b":"Round of 16 2 Winner","winner":null},{"a":"Round of 16 5 Winner","b":"Round of 16 6 Winner","winner":null},{"a":"Round of 16 3 Winner","b":"Round of 16 4 Winner","winner":null},{"a":"Round of 16 7 Winner","b":"Round of 16 8 Winner","winner":null}],
+  semiFinal:    [{"a":"Quarterfinal 1 Winner","b":"Quarterfinal 2 Winner","winner":null},{"a":"Quarterfinal 3 Winner","b":"Quarterfinal 4 Winner","winner":null}],
+  final:    [{"a":"Semifinal 1 Winner","b":"Semifinal 2 Winner","winner":null}],
 // __ACTUAL_MATCHUPS_END__
 };
 
