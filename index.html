@@ -96,7 +96,7 @@
     .b-match-group{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;min-height:20px;}
     .b-team{margin:1px 3px 1px 6px;padding:3px 6px;background:var(--white);border:1.5px solid var(--border);border-radius:4px;font-size:.65rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;z-index:1;}
     .b-team.winner{background:#EDF7F1;border-color:#52B788;color:var(--correct);font-weight:600;}
-    .b-team.loser{color:#A0A8B2;background:#F9FAFB;}
+    .b-team.loser{color:#ef4444;background:#FEF2F2;border-color:#ef4444;}
     .b-team.empty{color:#C5CBD3;border-style:dashed;font-style:italic;}
     .b-pts{font-size:.6rem;color:var(--correct);margin-left:4px;font-weight:700;}
     .b-svg{position:absolute;inset:0;pointer-events:none;overflow:visible;}
@@ -119,8 +119,8 @@
     .matchup-card{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
     .matchup-team{display:flex;align-items:center;gap:7px;padding:9px 12px;font-size:.84rem;font-weight:500;color:#374151;}
     .matchup-team+.matchup-team{border-top:1px dashed var(--border);}
-    .matchup-team.winner{background:#EDF7F1;color:var(--correct);}
-    .matchup-team.loser{color:#9CA3AF;}
+    .matchup-team.winner{background:#EDF7F1;color:var(--correct);border-left:3px solid #52B788;}
+    .matchup-team.loser{color:#ef4444;background:#FEF2F2;border-left:3px solid #ef4444;}
     .matchup-team.empty{color:#C5CBD3;font-style:italic;}
     .pick-pts{font-size:.7rem;font-weight:700;color:var(--correct);margin-left:auto;}
     .champ-solo{display:flex;justify-content:center;padding:2rem 0;}
@@ -508,14 +508,29 @@ function renderWCRound(){
     var champ=ACTUAL_RESULTS.champion||null;
     container.innerHTML='<div class="champ-solo"><div class="champ-card'+(champ?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">World Cup Champion</div><div class="cteam">'+(champ||'TBD')+'</div></div></div>';
   }else{
+    var matchups=(ACTUAL_MATCHUPS&&ACTUAL_MATCHUPS[round.key])||[];
     var html='<div class="matchup-grid">';
-    for(var i=1;i<=round.n;i+=2){
-      var tA=(ACTUAL_RESULTS[round.key]&&ACTUAL_RESULTS[round.key]['m'+i])||null;
-      var tB=(ACTUAL_RESULTS[round.key]&&ACTUAL_RESULTS[round.key]['m'+(i+1)])||null;
-      html+='<div class="matchup-card">'+
-        '<div class="matchup-team'+(tA?'':' empty')+'">'+(tA?getFlag(tA)+' '+tA:'TBD')+'</div>'+
-        '<div class="matchup-team'+(tB?'':' empty')+'">'+(tB?getFlag(tB)+' '+tB:'TBD')+'</div>'+
-        '</div>';
+    if(matchups.length>0){
+      matchups.forEach(function(m){
+        var aWon=m.winner&&normalize(m.winner)===normalize(m.a);
+        var bWon=m.winner&&normalize(m.winner)===normalize(m.b);
+        var aStatus=m.winner?(aWon?'winner':'loser'):'';
+        var bStatus=m.winner?(bWon?'winner':'loser'):'';
+        html+='<div class="matchup-card">'+
+          '<div class="matchup-team'+(m.a?' '+aStatus:' empty')+'">'+(m.a?getFlag(m.a)+' '+m.a:'TBD')+'</div>'+
+          '<div class="matchup-team'+(m.b?' '+bStatus:' empty')+'">'+(m.b?getFlag(m.b)+' '+m.b:'TBD')+'</div>'+
+          '</div>';
+      });
+    }else{
+      // Fallback: show winners list until matchups are populated
+      var winners=Object.values((ACTUAL_RESULTS[round.key])||{}).filter(Boolean);
+      if(winners.length){
+        winners.forEach(function(t){
+          html+='<div class="matchup-card"><div class="matchup-team winner">'+getFlag(t)+' '+t+'</div></div>';
+        });
+      }else{
+        html+='<div style="color:var(--muted);padding:1rem">No results yet.</div>';
+      }
     }
     html+='</div>';
     container.innerHTML=html;

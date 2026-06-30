@@ -61,6 +61,19 @@ const ACTUAL_RESULTS = {
 // __KNOCKOUT_RESULTS_END__
 };
 
+// ── ACTUAL MATCHUPS ───────────────────────────────────────────
+// Full bracket pairs per round: [{a, b, winner}]
+// Populated by CI — used to render the WC Table bracket correctly.
+const ACTUAL_MATCHUPS = {
+// __ACTUAL_MATCHUPS_START__
+  roundOf32:    [],
+  roundOf16:    [],
+  quarterFinal: [],
+  semiFinal:    [],
+  final:        [],
+// __ACTUAL_MATCHUPS_END__
+};
+
 // ── LIVE STANDINGS ────────────────────────────────────────────
 // Current top 2 per group based on live standings (updated hourly).
 // Used to color group stage picks green/red during the group stage.

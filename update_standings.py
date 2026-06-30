@@ -139,9 +139,14 @@ def detect_round_key(event):
     return None
 
 def fetch_knockout_results():
-    """Return dict with roundOf32…champion lists of winners from completed matches."""
-    slots = {k: [] for k in ROUND_SLOTS}
+    """Return (slots, matchups) for all completed knockout rounds.
+
+    slots    – {roundOf32: [winner, ...], ..., champion: str|None}
+    matchups – {roundOf32: [{a, b, winner}], ...}
+    """
+    slots    = {k: [] for k in ROUND_SLOTS}
     slots["champion"] = None
+    matchups = {k: [] for k in ROUND_SLOTS}
     seen = set()
 
     for dt in KNOCKOUT_DATES:
@@ -163,28 +168,48 @@ def fetch_knockout_results():
                 continue
             comp = (event.get("competitions") or [{}])[0]
             st = comp.get("status") or {}
-            if not (st.get("type") or {}).get("completed"):
-                continue
-            seen.add(eid)
+            completed = (st.get("type") or {}).get("completed", False)
             competitors = comp.get("competitors", [])
+
+            def team_name(c):
+                return (c.get("team") or {}).get("displayName") or (c.get("team") or {}).get("name", "")
+
+            # Always record the matchup pair (even if not yet complete)
+            seen.add(eid)
+            winner_obj = next((c for c in competitors if c.get("winner")), None)
+            wn = team_name(winner_obj) if winner_obj else None
+            names = [team_name(c) for c in competitors if team_name(c)]
+            a = names[0] if len(names) > 0 else None
+            b = names[1] if len(names) > 1 else None
+
+            matchups[round_key].append({"a": a, "b": b, "winner": wn if completed else None})
+
+            if not completed:
+                continue
+
             if round_key == "final":
                 for c in competitors:
-                    name = (c.get("team") or {}).get("displayName") or (c.get("team") or {}).get("name","")
-                    if name: slots["final"].append(name)
-                winner = next((c for c in competitors if c.get("winner")), None)
-                if winner:
-                    wn = (winner.get("team") or {}).get("displayName") or (winner.get("team") or {}).get("name","")
-                    if wn: slots["champion"] = wn
+                    n = team_name(c)
+                    if n: slots["final"].append(n)
+                if wn: slots["champion"] = wn
             else:
-                winner = next((c for c in competitors if c.get("winner")), None)
-                if winner:
-                    wn = (winner.get("team") or {}).get("displayName") or (winner.get("team") or {}).get("name","")
-                    if wn: slots[round_key].append(wn)
+                if wn: slots[round_key].append(wn)
 
-    for k, teams in slots.items():
-        if k != "champion":
-            print(f"  {k}: {len(teams)} winners found")
-    return slots
+    for k in ROUND_SLOTS:
+        print(f"  {k}: {len(slots[k])} winners, {len(matchups[k])} matchups")
+    return slots, matchups
+
+def build_matchups_js(matchups):
+    lines = []
+    for key in ROUND_SLOTS:
+        pairs = matchups.get(key, [])
+        if not pairs:
+            lines.append(f'  {key}:    [],')
+        else:
+            items = [f'{{"a":{json.dumps(m["a"])},"b":{json.dumps(m["b"])},"winner":{json.dumps(m["winner"])}}}'
+                     for m in pairs]
+            lines.append(f'  {key}:    [{",".join(items)}],')
+    return "\n".join(lines)
 
 def build_knockout_js(slots):
     lines = []
@@ -243,7 +268,7 @@ def build_thirds_js(live_thirds):
         return ""
     return "  " + ", ".join(f'"{t}"' for t in live_thirds)
 
-def patch_file(path, final_results, live_standings, group_standings, live_thirds, knockout_slots, ts):
+def patch_file(path, final_results, live_standings, group_standings, live_thirds, knockout_slots, matchups, ts):
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -283,6 +308,13 @@ def patch_file(path, final_results, live_standings, group_standings, live_thirds
         build_knockout_js(knockout_slots),
         path
     )
+    content = replace_between_markers(
+        content,
+        "// __ACTUAL_MATCHUPS_START__",
+        "// __ACTUAL_MATCHUPS_END__",
+        build_matchups_js(matchups),
+        path
+    )
 
     content = re.sub(r'var LAST_UPDATED = ".*?";',
                      f'var LAST_UPDATED = "{ts}";', content)
@@ -291,10 +323,10 @@ def patch_file(path, final_results, live_standings, group_standings, live_thirds
         f.write(content)
     print(f"  {path} patched.")
 
-def patch_all(final_results, live_standings, group_standings, live_thirds, knockout_slots):
+def patch_all(final_results, live_standings, group_standings, live_thirds, knockout_slots, matchups):
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    patch_file(DATA_JS,    final_results, live_standings, group_standings, live_thirds, knockout_slots, ts)
-    patch_file(INDEX_HTML, final_results, live_standings, group_standings, live_thirds, knockout_slots, ts)
+    patch_file(DATA_JS,    final_results, live_standings, group_standings, live_thirds, knockout_slots, matchups, ts)
+    patch_file(INDEX_HTML, final_results, live_standings, group_standings, live_thirds, knockout_slots, matchups, ts)
 
     for key in GROUP_KEYS:
         print(f"  {key}: final={final_results[key]}  live={live_standings[key]}  rows={len(group_standings[key])}")
@@ -311,6 +343,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print("Fetching knockout results from ESPN scoreboard...")
-    knockout_slots = fetch_knockout_results()
+    knockout_slots, matchups = fetch_knockout_results()
 
-    patch_all(final_results, live_standings, group_standings, live_thirds, knockout_slots)
+    patch_all(final_results, live_standings, group_standings, live_thirds, knockout_slots, matchups)
