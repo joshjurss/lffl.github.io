@@ -118,17 +118,24 @@ def fetch_standings():
 
 # ── Knockout results ─────────────────────────────────────────────────────────
 
-def detect_round_key(comp):
-    t = comp.get("type") or {}
-    candidates = [t.get("abbreviation",""), t.get("text",""), t.get("description",""), t.get("name","")]
-    for c in candidates:
-        u = c.upper().strip()
-        if not u: continue
-        if "32" in u:             return "roundOf32"
-        if "16" in u:             return "roundOf16"
-        if "QUART" in u:          return "quarterFinal"
-        if "SEMI" in u:           return "semiFinal"
-        if re.match(r"^(FINAL|F|CHAMPIONSHIP)$", u): return "final"
+def detect_round_key(event):
+    # event.season.slug is the reliable field: "round-of-32", "round-of-16", etc.
+    slug = (event.get("season") or {}).get("slug", "").lower()
+    if "group" in slug or not slug:
+        return None
+    if "32" in slug:     return "roundOf32"
+    if "16" in slug:     return "roundOf16"
+    if "quarter" in slug: return "quarterFinal"
+    if "semi" in slug:   return "semiFinal"
+    if "final" in slug:  return "final"
+    # Fallback: check altGameNote in competitions[0]
+    comp = (event.get("competitions") or [{}])[0]
+    note = (comp.get("altGameNote") or "").upper()
+    if "32" in note:     return "roundOf32"
+    if "16" in note:     return "roundOf16"
+    if "QUARTER" in note: return "quarterFinal"
+    if "SEMI" in note:   return "semiFinal"
+    if "FINAL" in note:  return "final"
     return None
 
 def fetch_knockout_results():
@@ -151,12 +158,12 @@ def fetch_knockout_results():
             eid = event.get("id")
             if eid in seen:
                 continue
-            comp = (event.get("competitions") or [{}])[0]
-            st = (comp.get("status") or event.get("status") or {})
-            if not (st.get("type") or {}).get("completed"):
-                continue
-            round_key = detect_round_key(comp)
+            round_key = detect_round_key(event)
             if not round_key:
+                continue
+            comp = (event.get("competitions") or [{}])[0]
+            st = comp.get("status") or {}
+            if not (st.get("type") or {}).get("completed"):
                 continue
             seen.add(eid)
             competitors = comp.get("competitors", [])

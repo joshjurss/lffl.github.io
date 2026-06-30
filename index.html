@@ -747,19 +747,24 @@ var ROUND_KEY_MAP={
   'SF':'semiFinal','SEMIFINAL':'semiFinal','SEMI-FINAL':'semiFinal',
   'F':'final','FINAL':'final','CHAMPIONSHIP':'final'
 };
-function detectRoundKey(comp){
-  var t=comp.type||{};
-  var candidates=[t.abbreviation,t.text,t.description,t.name];
-  for(var i=0;i<candidates.length;i++){
-    if(!candidates[i])continue;
-    var up=candidates[i].toUpperCase().trim();
-    if(ROUND_KEY_MAP[up])return ROUND_KEY_MAP[up];
-    if(/32/.test(up))return'roundOf32';
-    if(/16/.test(up))return'roundOf16';
-    if(/QUART/i.test(up))return'quarterFinal';
-    if(/SEMI/i.test(up))return'semiFinal';
-    if(/^FINAL$|^F$|CHAMPION/i.test(up))return'final';
+function detectRoundKey(event){
+  // event.season.slug is the reliable source: "round-of-32", "round-of-16", etc.
+  var slug=((event.season||{}).slug||'').toLowerCase();
+  if(slug&&!/group/.test(slug)){
+    if(/32/.test(slug))return'roundOf32';
+    if(/16/.test(slug))return'roundOf16';
+    if(/quarter/.test(slug))return'quarterFinal';
+    if(/semi/.test(slug))return'semiFinal';
+    if(/final/.test(slug))return'final';
   }
+  // Fallback: altGameNote in competitions[0]
+  var comp=(event.competitions&&event.competitions[0])||{};
+  var note=(comp.altGameNote||'').toUpperCase();
+  if(/32/.test(note))return'roundOf32';
+  if(/16/.test(note))return'roundOf16';
+  if(/QUARTER/.test(note))return'quarterFinal';
+  if(/SEMI/.test(note))return'semiFinal';
+  if(/FINAL/.test(note))return'final';
   return null;
 }
 function fetchKnockoutResults(){
@@ -771,12 +776,12 @@ function fetchKnockoutResults(){
     responses.forEach(function(data){
       (data.events||[]).forEach(function(event){
         if(seen[event.id])return; seen[event.id]=true;
+        var roundKey=detectRoundKey(event);
+        if(!roundKey)return;
         var comp=event.competitions&&event.competitions[0];
         if(!comp)return;
-        var st=event.status&&event.status.type;
-        if(!st||!st.completed)return;
-        var roundKey=detectRoundKey(comp);
-        if(!roundKey)return;
+        var st=(comp.status&&comp.status.type)||{};
+        if(!st.completed)return;
         var competitors=comp.competitors||[];
         if(roundKey==='final'){
           // Store both finalists so both show green in the Final bracket
