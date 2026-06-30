@@ -127,6 +127,10 @@
     .matchup-team.empty{color:#C5CBD3;font-style:italic;}
     .match-score{margin-left:auto;font-weight:700;font-size:.82rem;flex-shrink:0;}
     .pick-pts{font-size:.7rem;font-weight:700;color:var(--correct);margin-left:auto;}
+    .pick-score{font-family:'Bebas Neue',sans-serif;font-size:.95rem;font-weight:700;margin-left:auto;min-width:14px;text-align:right;line-height:1;}
+    .matchup-team.winner .pick-score{color:var(--correct);}
+    .matchup-team.loser .pick-score,.matchup-team.upset .pick-score{color:inherit;}
+    .pick-pts+.pick-score{margin-left:6px;}
     .champ-solo{display:flex;justify-content:center;padding:2rem 0;}
     .champ-solo .champ-card{max-width:200px;}
     .flag-emoji{display:none;}
@@ -471,6 +475,17 @@ function renderKnockoutRound(picks){
   }
 }
 
+function getMatchScore(pick,playedMatchups){
+  if(!pick||!playedMatchups)return null;
+  var norm=normalize(pick);
+  for(var i=0;i<playedMatchups.length;i++){
+    var m=playedMatchups[i];
+    if(m.winner===null)continue;
+    if(normalize(m.a)===norm)return{my:m.scoreA,their:m.scoreB};
+    if(normalize(m.b)===norm)return{my:m.scoreB,their:m.scoreA};
+  }
+  return null;
+}
 function matchupTeamRow(pick,actuals,pts,nextPicks,playedMatchups,roundKey){
   if(!pick)return'<div class="matchup-team empty">—</div>';
   var cls='',ptsHtml='',norm=normalize(pick);
@@ -478,6 +493,8 @@ function matchupTeamRow(pick,actuals,pts,nextPicks,playedMatchups,roundKey){
   if(roundKey&&isEliminatedBefore(pick,roundKey)){
     return'<div class="matchup-team eliminated">'+getFlag(pick)+' '+pick+'</div>';
   }
+  var scoreInfo=getMatchScore(pick,playedMatchups);
+  var scoreHtml=scoreInfo&&scoreInfo.my!=null?'<span class="pick-score">'+scoreInfo.my+'</span>':'';
   if(playedMatchups&&playedMatchups.length>0){
     var hasPlayed=playedMatchups.some(function(m){return m.winner!==null&&(normalize(m.a)===norm||normalize(m.b)===norm);});
     if(hasPlayed){
@@ -498,7 +515,7 @@ function matchupTeamRow(pick,actuals,pts,nextPicks,playedMatchups,roundKey){
       if(correct&&pts)ptsHtml='<span class="pick-pts">+'+pts+'</span>';
     }
   }
-  return'<div class="matchup-team '+cls+'">'+getFlag(pick)+' '+pick+ptsHtml+'</div>';
+  return'<div class="matchup-team '+cls+'">'+getFlag(pick)+' '+pick+ptsHtml+scoreHtml+'</div>';
 }
 
 
