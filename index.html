@@ -121,7 +121,9 @@
     .matchup-team+.matchup-team{border-top:1px dashed var(--border);}
     .matchup-team.winner{background:#EDF7F1;color:var(--correct);border-left:3px solid #52B788;}
     .matchup-team.loser{color:#ef4444;background:#FEF2F2;border-left:3px solid #ef4444;}
+    .matchup-team.advance{background:#EFF6FF;color:#1D4ED8;border-left:3px solid #3B82F6;}
     .matchup-team.empty{color:#C5CBD3;font-style:italic;}
+    .match-score{margin-left:auto;font-weight:700;font-size:.82rem;flex-shrink:0;}
     .pick-pts{font-size:.7rem;font-weight:700;color:var(--correct);margin-left:auto;}
     .champ-solo{display:flex;justify-content:center;padding:2rem 0;}
     .champ-solo .champ-card{max-width:200px;}
@@ -274,15 +276,22 @@ function scoreGroupStage(picks,actual){
   }
   return{pts:pts,correct:correct,total:total};
 }
+var NEXT_ROUND_KEY={roundOf32:'roundOf16',roundOf16:'quarterFinal',quarterFinal:'semiFinal',semiFinal:'final'};
 function scoreRound(picks,actual,roundKey,pts){
   var p=0,c=0,t=0,ar=actual[roundKey],pr=picks[roundKey];
   if(!ar||!pr)return{pts:p,correct:c,total:t};
   var actualTeams=Object.values(ar).filter(Boolean);
   if(actualTeams.length===0)return{pts:p,correct:c,total:t};
+  var nextKey=NEXT_ROUND_KEY[roundKey];
+  var nextPickTeams=nextKey?Object.values(picks[nextKey]||{}).filter(Boolean):[];
   Object.keys(pr).forEach(function(k){
     var pi=pr[k];if(!pi)return;
     t+=pts;
-    if(actualTeams.some(function(a){return teamsMatch(pi,a);})){p+=pts;c++;}
+    var won=actualTeams.some(function(a){return teamsMatch(pi,a);});
+    if(won){
+      var inNext=!nextKey||nextPickTeams.some(function(n){return teamsMatch(pi,n);});
+      if(inNext){p+=pts;c++;}
+    }
   });
   return{pts:p,correct:c,total:t};
 }
@@ -432,23 +441,43 @@ function renderKnockoutRound(picks){
     container.innerHTML='<div class="champ-solo"><div class="champ-card'+(cw?' won':'')+'"><div class="trophy">🏆</div><div class="clbl">Champion Pick</div><div class="cteam">'+(cp||'—')+'</div>'+cpts+'</div></div>';
   }else{
     var roundActuals=Object.values(ACTUAL_RESULTS[round.key]||{}).filter(Boolean);
-    var hasResults=roundActuals.length>0;
+    var playedMatchups=(ACTUAL_MATCHUPS&&ACTUAL_MATCHUPS[round.key])||[];
+    var nextKey=NEXT_ROUND_KEY[round.key];
+    var nextPicks=picks[nextKey]||{};
     var html='<div class="matchup-grid">';
     for(var i=1;i<=round.n;i+=2){
       var pA=(picks[round.key]&&picks[round.key]['m'+i])||null;
       var pB=(picks[round.key]&&picks[round.key]['m'+(i+1)])||null;
-      html+='<div class="matchup-card">'+matchupTeamRow(pA,hasResults,roundActuals,round.pts)+matchupTeamRow(pB,hasResults,roundActuals,round.pts)+'</div>';
+      html+='<div class="matchup-card">'+matchupTeamRow(pA,roundActuals,round.pts,nextPicks,playedMatchups)+matchupTeamRow(pB,roundActuals,round.pts,nextPicks,playedMatchups)+'</div>';
     }
     html+='</div>';
     container.innerHTML=html;
   }
 }
 
-function matchupTeamRow(pick,hasResults,actuals,pts){
-  var correct=pick&&hasResults&&actuals.some(function(a){return normalize(pick)===normalize(a);});
-  var cls=!pick?'empty':(!hasResults?'':(correct?'winner':'loser'));
-  var ptsHtml=correct&&pts?'<span class="pick-pts">+'+pts+'</span>':'';
-  return'<div class="matchup-team '+cls+'">'+(pick?getFlag(pick)+' '+pick:'—')+ptsHtml+'</div>';
+function matchupTeamRow(pick,actuals,pts,nextPicks,playedMatchups){
+  if(!pick)return'<div class="matchup-team empty">—</div>';
+  var cls='',ptsHtml='',norm=normalize(pick);
+  if(playedMatchups&&playedMatchups.length>0){
+    var hasPlayed=playedMatchups.some(function(m){return m.winner!==null&&(normalize(m.a)===norm||normalize(m.b)===norm);});
+    if(hasPlayed){
+      var won=actuals.some(function(a){return teamsMatch(pick,a);});
+      if(!won){cls='loser';}
+      else{
+        var inNext=nextPicks&&Object.values(nextPicks).some(function(t){return t&&teamsMatch(pick,t);});
+        if(inNext){cls='winner';if(pts)ptsHtml='<span class="pick-pts">+'+pts+'</span>';}
+        else{cls='advance';}
+      }
+    }
+  }else{
+    var hasResults=actuals.length>0;
+    if(hasResults){
+      var correct=actuals.some(function(a){return norm===normalize(a);});
+      cls=correct?'winner':'loser';
+      if(correct&&pts)ptsHtml='<span class="pick-pts">+'+pts+'</span>';
+    }
+  }
+  return'<div class="matchup-team '+cls+'">'+getFlag(pick)+' '+pick+ptsHtml+'</div>';
 }
 
 
@@ -516,9 +545,11 @@ function renderWCRound(){
         var bWon=m.winner&&normalize(m.winner)===normalize(m.b);
         var aStatus=m.winner?(aWon?'winner':'loser'):'';
         var bStatus=m.winner?(bWon?'winner':'loser'):'';
+        var saHtml=m.winner&&m.scoreA!=null?'<span class="match-score">'+m.scoreA+'</span>':'';
+        var sbHtml=m.winner&&m.scoreB!=null?'<span class="match-score">'+m.scoreB+'</span>':'';
         html+='<div class="matchup-card">'+
-          '<div class="matchup-team'+(m.a?' '+aStatus:' empty')+'">'+(m.a?getFlag(m.a)+' '+m.a:'TBD')+'</div>'+
-          '<div class="matchup-team'+(m.b?' '+bStatus:' empty')+'">'+(m.b?getFlag(m.b)+' '+m.b:'TBD')+'</div>'+
+          '<div class="matchup-team'+(m.a?' '+aStatus:' empty')+'">'+(m.a?getFlag(m.a)+' '+m.a:'TBD')+saHtml+'</div>'+
+          '<div class="matchup-team'+(m.b?' '+bStatus:' empty')+'">'+(m.b?getFlag(m.b)+' '+m.b:'TBD')+sbHtml+'</div>'+
           '</div>';
       });
     }else{

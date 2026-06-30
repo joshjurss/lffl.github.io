@@ -178,11 +178,14 @@ def fetch_knockout_results():
             seen.add(eid)
             winner_obj = next((c for c in competitors if c.get("winner")), None)
             wn = team_name(winner_obj) if winner_obj else None
-            names = [team_name(c) for c in competitors if team_name(c)]
-            a = names[0] if len(names) > 0 else None
-            b = names[1] if len(names) > 1 else None
+            a_c = competitors[0] if len(competitors) > 0 else {}
+            b_c = competitors[1] if len(competitors) > 1 else {}
+            a = team_name(a_c) or None
+            b = team_name(b_c) or None
+            score_a = a_c.get("score") if a_c else None
+            score_b = b_c.get("score") if b_c else None
 
-            matchups[round_key].append({"a": a, "b": b, "winner": wn if completed else None})
+            matchups[round_key].append({"a": a, "b": b, "winner": wn if completed else None, "scoreA": score_a, "scoreB": score_b})
 
             if not completed:
                 continue
@@ -206,7 +209,7 @@ def build_matchups_js(matchups):
         if not pairs:
             lines.append(f'  {key}:    [],')
         else:
-            items = [f'{{"a":{json.dumps(m["a"])},"b":{json.dumps(m["b"])},"winner":{json.dumps(m["winner"])}}}'
+            items = [f'{{"a":{json.dumps(m["a"])},"b":{json.dumps(m["b"])},"winner":{json.dumps(m["winner"])},"scoreA":{json.dumps(m.get("scoreA"))},"scoreB":{json.dumps(m.get("scoreB"))}}}'
                      for m in pairs]
             lines.append(f'  {key}:    [{",".join(items)}],')
     return "\n".join(lines)
