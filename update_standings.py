@@ -9,15 +9,34 @@ Run by GitHub Actions every hour.
 Requires: pip install requests
 """
 
+import json
 import re
 import sys
 import requests
 from datetime import datetime, timezone
 
-ESPN_URL = "https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings"
-HEADERS  = {"User-Agent": "Mozilla/5.0"}
-DATA_JS   = "data.js"
-INDEX_HTML = "index.html"
+ESPN_URL        = "https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings"
+ESPN_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard"
+HEADERS         = {"User-Agent": "Mozilla/5.0"}
+DATA_JS         = "data.js"
+INDEX_HTML      = "index.html"
+
+# All knockout dates: R32 (Jun 28–Jul 3), R16 (Jul 4–7), QF (Jul 9–11), SF (Jul 14–15), Final (Jul 19)
+KNOCKOUT_DATES = [
+    "20260628","20260629","20260630","20260701","20260702","20260703",
+    "20260704","20260705","20260706","20260707",
+    "20260709","20260710","20260711",
+    "20260714","20260715",
+    "20260718","20260719",
+]
+
+ROUND_SLOTS = {
+    "roundOf32":    16,
+    "roundOf16":    16,
+    "quarterFinal": 8,
+    "semiFinal":    4,
+    "final":        2,
+}
 
 GROUP_KEYS = ["groupA","groupB","groupC","groupD","groupE","groupF",
               "groupG","groupH","groupI","groupJ","groupK","groupL"]
@@ -97,6 +116,83 @@ def fetch_standings():
     return final_results, live_standings, group_standings, live_thirds
 
 
+# ── Knockout results ─────────────────────────────────────────────────────────
+
+def detect_round_key(comp):
+    t = comp.get("type") or {}
+    candidates = [t.get("abbreviation",""), t.get("text",""), t.get("description",""), t.get("name","")]
+    for c in candidates:
+        u = c.upper().strip()
+        if not u: continue
+        if "32" in u:             return "roundOf32"
+        if "16" in u:             return "roundOf16"
+        if "QUART" in u:          return "quarterFinal"
+        if "SEMI" in u:           return "semiFinal"
+        if re.match(r"^(FINAL|F|CHAMPIONSHIP)$", u): return "final"
+    return None
+
+def fetch_knockout_results():
+    """Return dict with roundOf32…champion lists of winners from completed matches."""
+    slots = {k: [] for k in ROUND_SLOTS}
+    slots["champion"] = None
+    seen = set()
+
+    for dt in KNOCKOUT_DATES:
+        try:
+            r = requests.get(ESPN_SCOREBOARD, params={"dates": dt}, headers=HEADERS, timeout=20)
+            if r.status_code != 200:
+                continue
+            data = r.json()
+        except Exception as e:
+            print(f"  Scoreboard {dt} error: {e}")
+            continue
+
+        for event in data.get("events", []):
+            eid = event.get("id")
+            if eid in seen:
+                continue
+            comp = (event.get("competitions") or [{}])[0]
+            st = (comp.get("status") or event.get("status") or {})
+            if not (st.get("type") or {}).get("completed"):
+                continue
+            round_key = detect_round_key(comp)
+            if not round_key:
+                continue
+            seen.add(eid)
+            competitors = comp.get("competitors", [])
+            if round_key == "final":
+                for c in competitors:
+                    name = (c.get("team") or {}).get("displayName") or (c.get("team") or {}).get("name","")
+                    if name: slots["final"].append(name)
+                winner = next((c for c in competitors if c.get("winner")), None)
+                if winner:
+                    wn = (winner.get("team") or {}).get("displayName") or (winner.get("team") or {}).get("name","")
+                    if wn: slots["champion"] = wn
+            else:
+                winner = next((c for c in competitors if c.get("winner")), None)
+                if winner:
+                    wn = (winner.get("team") or {}).get("displayName") or (winner.get("team") or {}).get("name","")
+                    if wn: slots[round_key].append(wn)
+
+    for k, teams in slots.items():
+        if k != "champion":
+            print(f"  {k}: {len(teams)} winners found")
+    return slots
+
+def build_knockout_js(slots):
+    lines = []
+    for key, n in ROUND_SLOTS.items():
+        teams = slots.get(key, [])
+        parts = []
+        for i in range(1, n + 1):
+            team = teams[i - 1] if i <= len(teams) else None
+            parts.append(f'm{i}:{json.dumps(team)}')
+        lines.append(f'  {key}:    {{{",".join(parts)}}},')
+    champ = slots.get("champion")
+    lines.append(f'  champion:     {json.dumps(champ)},')
+    return "\n".join(lines)
+
+
 # ── Patch helpers ─────────────────────────────────────────────────────────────
 
 def build_group_js(standings):
@@ -140,7 +236,7 @@ def build_thirds_js(live_thirds):
         return ""
     return "  " + ", ".join(f'"{t}"' for t in live_thirds)
 
-def patch_file(path, final_results, live_standings, group_standings, live_thirds, ts):
+def patch_file(path, final_results, live_standings, group_standings, live_thirds, knockout_slots, ts):
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -173,6 +269,14 @@ def patch_file(path, final_results, live_standings, group_standings, live_thirds
         path
     )
 
+    content = replace_between_markers(
+        content,
+        "// __KNOCKOUT_RESULTS_START__",
+        "// __KNOCKOUT_RESULTS_END__",
+        build_knockout_js(knockout_slots),
+        path
+    )
+
     content = re.sub(r'var LAST_UPDATED = ".*?";',
                      f'var LAST_UPDATED = "{ts}";', content)
 
@@ -180,10 +284,10 @@ def patch_file(path, final_results, live_standings, group_standings, live_thirds
         f.write(content)
     print(f"  {path} patched.")
 
-def patch_all(final_results, live_standings, group_standings, live_thirds):
+def patch_all(final_results, live_standings, group_standings, live_thirds, knockout_slots):
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    patch_file(DATA_JS,    final_results, live_standings, group_standings, live_thirds, ts)
-    patch_file(INDEX_HTML, final_results, live_standings, group_standings, live_thirds, ts)
+    patch_file(DATA_JS,    final_results, live_standings, group_standings, live_thirds, knockout_slots, ts)
+    patch_file(INDEX_HTML, final_results, live_standings, group_standings, live_thirds, knockout_slots, ts)
 
     for key in GROUP_KEYS:
         print(f"  {key}: final={final_results[key]}  live={live_standings[key]}  rows={len(group_standings[key])}")
@@ -192,11 +296,14 @@ def patch_all(final_results, live_standings, group_standings, live_thirds):
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print(f"Fetching standings from ESPN API...")
+    print("Fetching standings from ESPN API...")
     try:
         final_results, live_standings, group_standings, live_thirds = fetch_standings()
     except Exception as e:
         print(f"ERROR fetching standings: {e}")
         sys.exit(1)
 
-    patch_all(final_results, live_standings, group_standings, live_thirds)
+    print("Fetching knockout results from ESPN scoreboard...")
+    knockout_slots = fetch_knockout_results()
+
+    patch_all(final_results, live_standings, group_standings, live_thirds, knockout_slots)

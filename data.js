@@ -50,13 +50,15 @@ const ACTUAL_RESULTS = {
   groupL: ["England", "Croatia"],
 // __ACTUAL_RESULTS_END__
 
-  // Knockout rounds — fill in winner of each match slot
+  // Knockout rounds — winners populated by CI
+// __KNOCKOUT_RESULTS_START__
   roundOf32:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null },
   roundOf16:    { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null,m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null },
   quarterFinal: { m1:null,m2:null,m3:null,m4:null,m5:null,m6:null,m7:null,m8:null },
   semiFinal:    { m1:null,m2:null,m3:null,m4:null },
   final:        { m1:null,m2:null },
   champion:     null,
+// __KNOCKOUT_RESULTS_END__
 };
 
 // ── LIVE STANDINGS ────────────────────────────────────────────

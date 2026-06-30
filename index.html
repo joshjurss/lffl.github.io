@@ -594,6 +594,45 @@ function initStandings(){
     }
     grid.appendChild(card);
   });
+  // ── Third-place table ─────────────────────────────────────────
+  var thirdRows=[];
+  Object.keys(groupLabels).forEach(function(g){
+    var rows=(GROUP_STANDINGS[g]||[]).slice().sort(function(a,b){return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf;});
+    if(rows.length>=3&&rows[2].mp>0)thirdRows.push(rows[2]);
+  });
+  thirdRows.sort(function(a,b){return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf;});
+  if(thirdRows.length>0){
+    var thirdSec=document.createElement('div');
+    thirdSec.style.cssText='margin-top:1.5rem;';
+    var thirdHeader='<div class="fm-header" style="background:#374151;margin-bottom:8px;border-radius:6px 6px 0 0">Best Third-Place Teams <span style="font-size:.7rem;opacity:.7;font-weight:400;letter-spacing:0">— top 8 advance to Round of 32</span></div>';
+    var thirdBody='<table class="fm-table"><thead><tr><th></th><th></th><th class="th-team">Team</th><th>Group</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead><tbody>';
+    thirdRows.forEach(function(t,i){
+      var advances=LIVE_THIRDS.some(function(a){return normalize(a)===normalize(t.team);});
+      var groupLabel='';
+      Object.keys(groupLabels).forEach(function(g){
+        var rows=(GROUP_STANDINGS[g]||[]).slice().sort(function(a,b){return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf;});
+        if(rows.length>=3&&normalize(rows[2].team)===normalize(t.team))groupLabel=groupLabels[g].replace('Group ','');
+      });
+      var gdCls=t.gd>0?'pos':t.gd<0?'neg':'';
+      var gdStr=t.gd>0?'+'+t.gd:String(t.gd);
+      var rowCls=advances?'fm-advance':'';
+      var advBadge=advances?'<span style="font-size:.65rem;background:#4caf50;color:#fff;border-radius:3px;padding:1px 5px;margin-left:6px">ADV</span>':'';
+      if(i===7)thirdBody+='<tr><td colspan="12" style="height:2px;background:#d1d9e0;padding:0"></td></tr>';
+      thirdBody+='<tr class="'+rowCls+'">'+
+        '<td class="td-pos">'+(i+1)+'</td>'+
+        '<td class="td-flag">'+getFlag(t.team)+'</td>'+
+        '<td class="td-team">'+t.team+advBadge+'</td>'+
+        '<td style="color:var(--muted);font-size:.75rem">'+groupLabel+'</td>'+
+        '<td>'+t.mp+'</td><td>'+t.w+'</td><td>'+t.d+'</td><td>'+t.l+'</td>'+
+        '<td>'+t.gf+'</td><td>'+t.ga+'</td>'+
+        '<td class="td-gd '+gdCls+'">'+gdStr+'</td>'+
+        '<td class="td-pts">'+t.pts+'</td></tr>';
+    });
+    thirdBody+='</tbody></table>';
+    thirdSec.innerHTML=thirdHeader+thirdBody;
+    grid.parentNode.insertBefore(thirdSec,grid.nextSibling);
+  }
+
   document.getElementById('wc-bracket-body').innerHTML=buildWCBracketHTML();
   renderWCRound();
 }
@@ -700,7 +739,7 @@ function renderGames(events){
 
 // ── KNOCKOUT RESULTS FROM ESPN ────────────────────────────────
 // WC 2026 knockout dates: July 5-26, 2026
-var KNOCKOUT_DATE_RANGES=['20260705','20260706','20260707','20260710','20260711','20260716','20260717','20260721','20260722','20260726'];
+var KNOCKOUT_DATE_RANGES=['20260628','20260629','20260630','20260701','20260702','20260703','20260704','20260705','20260706','20260707','20260710','20260711','20260716','20260717','20260721','20260722','20260726'];
 var ROUND_KEY_MAP={
   'R32':'roundOf32','OF32':'roundOf32','ROUND OF 32':'roundOf32',
   'R16':'roundOf16','OF16':'roundOf16','ROUND OF 16':'roundOf16',
