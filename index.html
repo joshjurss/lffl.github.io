@@ -246,7 +246,7 @@
 // ══════════════════════════════════════════════════════════════
 function normalize(t){
   if(!t)return"";
-  var a={"czech republic":"czechia","czechia":"czechia","turkey":"turkey","türkiye":"turkey","turkiye":"turkey","ivory coast":"ivory coast","côte d'ivoire":"ivory coast","cote d'ivoire":"ivory coast","dr congo":"dr congo","congo dr":"dr congo","curacao":"curacao","curaçao":"curacao","usa":"united states","south korea":"south korea","korea republic":"south korea"};
+  var a={"czech republic":"czechia","czechia":"czechia","turkey":"turkey","türkiye":"turkey","turkiye":"turkey","ivory coast":"ivory coast","côte d'ivoire":"ivory coast","cote d'ivoire":"ivory coast","dr congo":"dr congo","congo dr":"dr congo","curacao":"curacao","curaçao":"curacao","usa":"united states","south korea":"south korea","korea republic":"south korea","bosnia and herzegovina":"bosnia-herzegovina","bosnia-herzegovina":"bosnia-herzegovina","bosnia & herzegovina":"bosnia-herzegovina"};
   var l=t.toLowerCase().trim();return a[l]||l;
 }
 function teamsMatch(a,b){return normalize(a)===normalize(b);}
