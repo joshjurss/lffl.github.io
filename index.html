@@ -283,6 +283,17 @@ function scoreGroupStage(picks,actual){
   return{pts:pts,correct:correct,total:total};
 }
 var NEXT_ROUND_KEY={roundOf32:'roundOf16',roundOf16:'quarterFinal',quarterFinal:'semiFinal',semiFinal:'final'};
+var KNOCKOUT_GROUPS=["groupA","groupB","groupC","groupD","groupE","groupF","groupG","groupH","groupI","groupJ","groupK","groupL"];
+function groupStageComplete(){
+  return KNOCKOUT_GROUPS.every(function(g){var r=ACTUAL_RESULTS[g];return r&&r[0]&&r[1];});
+}
+function didNotQualify(team){
+  if(!groupStageComplete())return false;
+  var norm=normalize(team);
+  var inGroups=KNOCKOUT_GROUPS.some(function(g){return(ACTUAL_RESULTS[g]||[]).some(function(t){return normalize(t)===norm;});});
+  if(inGroups)return false;
+  return!LIVE_THIRDS.some(function(t){return normalize(t)===norm;});
+}
 var ROUND_ORDER=['roundOf32','roundOf16','quarterFinal','semiFinal','final'];
 function isEliminatedBefore(team,roundKey){
   var idx=ROUND_ORDER.indexOf(roundKey);
@@ -489,8 +500,8 @@ function getMatchScore(pick,playedMatchups){
 function matchupTeamRow(pick,actuals,pts,nextPicks,playedMatchups,roundKey){
   if(!pick)return'<div class="matchup-team empty">—</div>';
   var cls='',ptsHtml='',norm=normalize(pick);
-  // Eliminated in a prior round → grey strikethrough
-  if(roundKey&&isEliminatedBefore(pick,roundKey)){
+  // Never made it to knockout stage, or eliminated in a prior round → grey strikethrough
+  if(didNotQualify(pick)||(roundKey&&isEliminatedBefore(pick,roundKey))){
     return'<div class="matchup-team eliminated">'+getFlag(pick)+' '+pick+'</div>';
   }
   var scoreHtml='';
