@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "2026-07-14 21:59 UTC"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-07-14 23:04 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
