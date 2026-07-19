@@ -18,7 +18,7 @@
 // Group K:  Portugal, Colombia, Uzbekistan, DR Congo
 // Group L:  England, Croatia, Panama, Ghana
 
-var LAST_UPDATED = "2026-07-19 21:54 UTC"; // auto-updated by GitHub Actions
+var LAST_UPDATED = "2026-07-19 22:54 UTC"; // auto-updated by GitHub Actions
 
 const SCORING = {
   groupStage:   1,   // per correct advancing team pick
@@ -56,8 +56,8 @@ const ACTUAL_RESULTS = {
   roundOf16:    {m1:"Morocco",m2:"France",m3:"Norway",m4:"England",m5:"Spain",m6:"Belgium",m7:"Argentina",m8:"Switzerland",m9:null,m10:null,m11:null,m12:null,m13:null,m14:null,m15:null,m16:null},
   quarterFinal:    {m1:"France",m2:"Spain",m3:"England",m4:"Argentina",m5:null,m6:null,m7:null,m8:null},
   semiFinal:    {m1:"Spain",m2:"Argentina",m3:null,m4:null},
-  final:    {m1:null,m2:null},
-  champion:     null,
+  final:    {m1:"Spain",m2:"Argentina"},
+  champion:     "Spain",
 // __KNOCKOUT_RESULTS_END__
 };
 
@@ -70,7 +70,7 @@ const ACTUAL_MATCHUPS = {
   roundOf16:    [{"a":"Canada","b":"Morocco","winner":"Morocco","scoreA":"0","scoreB":"3","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"Paraguay","b":"France","winner":"France","scoreA":"0","scoreB":"1","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"Brazil","b":"Norway","winner":"Norway","scoreA":"1","scoreB":"2","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"Mexico","b":"England","winner":"England","scoreA":"2","scoreB":"3","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"Portugal","b":"Spain","winner":"Spain","scoreA":"0","scoreB":"1","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"United States","b":"Belgium","winner":"Belgium","scoreA":"1","scoreB":"4","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"Argentina","b":"Egypt","winner":"Argentina","scoreA":"3","scoreB":"2","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"Switzerland","b":"Colombia","winner":"Switzerland","scoreA":"0","scoreB":"0","shootout":true,"shootoutA":4,"shootoutB":3}],
   quarterFinal:    [{"a":"France","b":"Morocco","winner":"France","scoreA":"2","scoreB":"0","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"Spain","b":"Belgium","winner":"Spain","scoreA":"2","scoreB":"1","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"Norway","b":"England","winner":"England","scoreA":"1","scoreB":"2","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"Argentina","b":"Switzerland","winner":"Argentina","scoreA":"3","scoreB":"1","shootout":false,"shootoutA":null,"shootoutB":null}],
   semiFinal:    [{"a":"France","b":"Spain","winner":"Spain","scoreA":"0","scoreB":"2","shootout":false,"shootoutA":null,"shootoutB":null},{"a":"England","b":"Argentina","winner":"Argentina","scoreA":"1","scoreB":"2","shootout":false,"shootoutA":null,"shootoutB":null}],
-  final:    [{"a":"Spain","b":"Argentina","winner":null,"scoreA":"1","scoreB":"0","shootout":false,"shootoutA":null,"shootoutB":null}],
+  final:    [{"a":"Spain","b":"Argentina","winner":"Spain","scoreA":"1","scoreB":"0","shootout":false,"shootoutA":null,"shootoutB":null}],
 // __ACTUAL_MATCHUPS_END__
 };
 
